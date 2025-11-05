@@ -7,14 +7,62 @@
   "targets": {
     ".NETCoreApp,Version=v8.0": {
       "WebPracticalProject/1.0.0": {
+        "dependencies": {
+          "WebPracticalProject.Service": "1.0.0"
+        },
         "runtime": {
           "WebPracticalProject.dll": {}
+        }
+      },
+      "WebPracticalProject.DAL/1.0.0": {
+        "dependencies": {
+          "WebPracticalProject.Domain": "1.0.0"
+        },
+        "runtime": {
+          "WebPracticalProject.DAL.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "WebPracticalProject.Domain/1.0.0": {
+        "runtime": {
+          "WebPracticalProject.Domain.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "WebPracticalProject.Service/1.0.0": {
+        "dependencies": {
+          "WebPracticalProject.DAL": "1.0.0"
+        },
+        "runtime": {
+          "WebPracticalProject.Service.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
         }
       }
     }
   },
   "libraries": {
     "WebPracticalProject/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebPracticalProject.DAL/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebPracticalProject.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "WebPracticalProject.Service/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

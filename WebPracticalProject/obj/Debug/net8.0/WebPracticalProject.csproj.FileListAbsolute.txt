@@ -6,6 +6,13 @@ D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPract
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.runtimeconfig.json
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.dll
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.pdb
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.DAL.dll
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.Domain.dll
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.Service.dll
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.Service.pdb
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.DAL.pdb
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\bin\Debug\net8.0\WebPracticalProject.Domain.pdb
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.csproj.AssemblyReference.cache
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.GeneratedMSBuildEditorConfig.editorconfig
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.AssemblyInfoInputs.cache
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.AssemblyInfo.cs
@@ -24,6 +31,7 @@ D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\staticwe
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\scopedcss\Views\Shared\_Layout.cshtml.rz.scp.css
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\scopedcss\bundle\WebPracticalProject.styles.css
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\scopedcss\projectbundle\WebPracticalProject.bundle.scp.css
+D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPract.79D4E27C.Up2Date
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.dll
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\refint\WebPracticalProject.dll
 D:\code\Csharp\WebPracticalProject\WebPracticalProject\obj\Debug\net8.0\WebPracticalProject.pdb

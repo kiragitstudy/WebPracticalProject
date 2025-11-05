@@ -1,8 +1,295 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Музыкальные инструменты — прокат и каталог";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- HERO -->
+<section class="hero-section py-5 py-lg-6 bg-gradient position-relative">
+    <div class="container py-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <h1 class="display-5 mb-3">Каталог музыкальных инструментов с прокатом</h1>
+                <p class="lead text-body-secondary mb-4">
+                    Акустические и электронные инструменты на любой случай: концерты, мероприятия, студийная работа и обучение.
+                    Доставка, настройка, техподдержка.
+                </p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a class="btn btn-primary btn-lg" href="#catalog"><i class="bi bi-bag-plus me-1"></i> Перейти в каталог</a>
+                    <a class="btn btn-outline-primary btn-lg" href="#message"><i class="bi bi-chat-text me-1"></i> Задать вопрос</a>
+                </div>
+                <div class="d-flex gap-4 mt-4 small text-body-secondary">
+                    <span><i class="bi bi-truck me-1"></i> Доставка в день заказа*</span>
+                    <span><i class="bi bi-shield-check me-1"></i> Проверенные инструменты</span>
+                    <span><i class="bi bi-gear me-1"></i> Настройка на площадке</span>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="rounded-4 overflow-hidden shadow-sm hero-image ratio ratio-4x3">
+                    <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Музыкальные инструменты"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="py-5">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <h2 class="h1 mb-3">О нас</h2>
+                <p class="mb-3">
+                    Команда музыкантов и инженеров с опытом работы на концертах, фестивалях и в студиях. Помогаем подобрать инструмент,
+                    доставляем и настраиваем оборудование под задачу.
+                </p>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i> Парк из более 200 позиций</li>
+                    <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i> Официальные договоры проката</li>
+                    <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i> Срочная замена в случае поломки</li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <i class="bi bi-music-note fs-2 text-primary"></i>
+                                <h3 class="h5 mt-3 mb-2">Струнные</h3>
+                                <p class="text-body-secondary small mb-0">Гитары, басы, скрипки, виолончели</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <i class="bi bi-dribbble fs-2 text-primary"></i>
+                                <h3 class="h5 mt-3 mb-2">Ударные</h3>
+                                <p class="text-body-secondary small mb-0">Акустические и электронные барабаны</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <i class="bi bi-keyboard fs-2 text-primary"></i>
+                                <h3 class="h5 mt-3 mb-2">Клавишные</h3>
+                                <p class="text-body-secondary small mb-0">Синтезаторы, пианино, midi-клавиатуры</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <i class="bi bi-mic fs-2 text-primary"></i>
+                                <h3 class="h5 mt-3 mb-2">Звук</h3>
+                                <p class="text-body-secondary small mb-0">Микрофоны, акустические системы, микшеры</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="h1 mb-4 text-center">Услуги</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-bag-check fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Прокат инструментов</h3>
+                        <p class="text-body-secondary mb-0">Посуточно и помесячно. Гибкие тарифы и страхование.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-truck fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Доставка и возврат</h3>
+                        <p class="text-body-secondary mb-0">К двери репточки, площадки или дома. Аккуратно и вовремя.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-sliders fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Настройка на площадке</h3>
+                        <p class="text-body-secondary mb-0">Техник приедет, соберёт, проверит звук и оставит инструкцию.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-tools fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Сервис и ремонт</h3>
+                        <p class="text-body-secondary mb-0">Плановое ТО, чистка, ремонт, замена струн и расходников.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-calendar-event fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Ивент-пакеты</h3>
+                        <p class="text-body-secondary mb-0">Комплекты для концертов и мероприятий «под ключ».</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="h-100 card border-0 shadow-sm">
+                    <div class="card-body">
+                        <i class="bi bi-person-video3 fs-2 text-primary"></i>
+                        <h3 class="h5 mt-3">Консультации</h3>
+                        <p class="text-body-secondary mb-0">Подбор инструмента под жанр, площадку и бюджет.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CATALOG PREVIEW -->
+<section id="catalog" class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h1 mb-0">Популярно сейчас</h2>
+            <a class="btn btn-outline-primary" asp-controller="Catalog" asp-action="Index">
+                Перейти ко всем позициям
+            </a>
+        </div>
+        <div class="row g-4">
+            @* Примеры карточек — заменишь данными из БД *@
+            @{
+                var cards = new [] {
+                    new {Title="Электрогитара Fender", Img="https://images.unsplash.com/photo-1505685296765-3a2736de412f?q=80&w=1200&auto=format&fit=crop"},
+                    new {Title="Синтезатор Korg", Img="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1200&auto=format&fit=crop"},
+                    new {Title="Саксофон альт", Img="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?q=80&w=1200&auto=format&fit=crop"},
+                };
+            }
+            @foreach (var c in cards)
+            {
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="ratio ratio-4x3">
+                            <img src="@c.Img" class="card-img-top object-fit-cover" alt="@c.Title"/>
+                        </div>
+                        <div class="card-body d-flex flex-column">
+                            <h3 class="h5 card-title">@c.Title</h3>
+                            <p class="text-body-secondary small flex-grow-1">Посуточно от 20 € · Залог по договору</p>
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-primary" asp-controller="Catalog" asp-action="Details">Подробнее</a>
+                                <a class="btn btn-outline-primary" asp-controller="Orders" asp-action="Create">В прокат</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts" class="py-5 bg-light">
+    <div class="container">
+        <h2 class="h1 mb-4">Контакты</h2>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="p-4 border rounded-4 bg-white h-100">
+                    <div class="mb-3">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        <span>Кишинёв, центр (пример адреса)</span>
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-telephone me-2"></i>
+                        <a href="tel:+37300000000" class="text-decoration-none">+373 (000) 00-00</a>
+                    </div>
+                    <div class="mb-3">
+                        <i class="bi bi-envelope me-2"></i>
+                        <a href="mailto:rent@music.example" class="text-decoration-none">rent@music.example</a>
+                    </div>
+                    <div class="mb-0">
+                        <i class="bi bi-clock me-2"></i>
+                        <span>Ежедневно 10:00–21:00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-sm">
+                    <iframe
+                        src="https://maps.google.com/maps?q=Chisinau&hl=ru&z=12&output=embed"
+                        style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        title="Карта">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- MESSAGE FORM -->
+<section id="message" class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <h2 class="h1 mb-3">Написать сообщение</h2>
+                <p class="text-body-secondary">
+                    Опиши задачу: мероприятие, жанр, площадка. Подберём комплект и рассчитаем стоимость.
+                </p>
+                <form asp-controller="Contact" asp-action="Send" method="post" class="needs-validation" novalidate>
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="msgName">Имя</label>
+                            <input id="msgName" name="Name" type="text" class="form-control" required/>
+                            <div class="invalid-feedback">Укажи имя</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="msgEmail">Email</label>
+                            <input id="msgEmail" name="Email" type="email" class="form-control" required/>
+                            <div class="invalid-feedback">Укажи корректный email</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="msgSubject">Тема</label>
+                            <input id="msgSubject" name="Subject" type="text" class="form-control" placeholder="Прокат синтезатора на 2 дня" required/>
+                            <div class="invalid-feedback">Добавь тему</div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="msgText">Сообщение</label>
+                            <textarea id="msgText" name="Message" rows="5" class="form-control" placeholder="Дата, адрес, список оборудования..." required></textarea>
+                            <div class="invalid-feedback">Напиши сообщение</div>
+                        </div>
+                        <div class="col-12 d-flex align-items-center gap-2">
+                            <input id="agree" name="Agree" type="checkbox" class="form-check-input" required/>
+                            <label for="agree" class="form-check-label small text-body-secondary">
+                                Согласие на обработку персональных данных
+                            </label>
+                            <div class="invalid-feedback d-block">Подтверди согласие</div>
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary btn-lg" type="submit">
+                                <i class="bi bi-send me-1"></i> Отправить
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6">
+                <div class="p-4 border rounded-4 h-100">
+                    <h3 class="h5 mb-3">Как работает прокат</h3>
+                    <ol class="mb-0 ps-3">
+                        <li class="mb-2">Выбор инструмента в каталоге или консультация</li>
+                        <li class="mb-2">Заключение договора и залог</li>
+                        <li class="mb-2">Доставка/самовывоз и настройка</li>
+                        <li class="mb-0">Возврат, осмотр, возврат залога</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

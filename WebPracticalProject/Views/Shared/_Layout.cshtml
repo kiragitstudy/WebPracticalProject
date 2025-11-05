@@ -1,49 +1,175 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@*
+  Views/Shared/_Layout.cshtml
+*@
+<!DOCTYPE html>
+<html lang="ru">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - WebPracticalProject</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/WebPracticalProject.styles.css" asp-append-version="true"/>
+    <!-- Bootstrap Icons (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 </head>
-<body>
+<body data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="80" tabindex="0">
+
 <header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebPracticalProject</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
+    <nav id="mainNav" class="navbar navbar-expand-lg navbar-light bg-white border-bottom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">
+                WebPracticalProject
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+                    aria-controls="navbarMain" aria-expanded="false" aria-label="Переключить навигацию">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
+
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Главная</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">О нас</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Услуги</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#catalog">Каталог</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contacts">Контакты</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#message">Написать</a></li>
                 </ul>
+
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Войти
+                    </button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                        <i class="bi bi-person-plus me-1"></i> Регистрация
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 </header>
-<div class="container">
-    <main role="main" class="pb-3">
-        @RenderBody()
-    </main>
-</div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - WebPracticalProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<main role="main">
+    @RenderBody()
+</main>
+
+<footer class="border-top mt-5">
+    <div class="container py-4">
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-music-note-beamed fs-4"></i>
+                    <span class="small text-muted">
+                        © 2025 WebPracticalProject — каталог и прокат музыкальных инструментов
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a class="text-decoration-none me-3" asp-controller="Home" asp-action="Privacy">Политика конфиденциальности</a>
+                <a class="text-decoration-none" href="#top">Наверх</a>
+            </div>
+        </div>
     </div>
 </footer>
+
+<!-- Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title">Вход в аккаунт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form asp-controller="Account" asp-action="Login" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="loginEmail">Email</label>
+                        <input id="loginEmail" name="Email" type="email" class="form-control" placeholder="you@example.com" required/>
+                        <div class="invalid-feedback">Укажите корректный email</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="loginPassword">Пароль</label>
+                        <input id="loginPassword" name="Password" type="password" class="form-control" minlength="6" required/>
+                        <div class="invalid-feedback">Пароль обязателен</div>
+                    </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" id="rememberMe" name="RememberMe" type="checkbox"/>
+                        <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Отмена</button>
+                    <button class="btn btn-primary" type="submit">Войти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Register Modal -->
+<div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header">
+                <h5 class="modal-title">Регистрация</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <form asp-controller="Account" asp-action="Register" method="post" class="needs-validation" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="regName">Имя</label>
+                        <input id="regName" name="DisplayName" type="text" class="form-control" placeholder="Например: Иван" minlength="2" required/>
+                        <div class="invalid-feedback">Имя должно быть не короче 2 символов</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="regEmail">Email</label>
+                        <input id="regEmail" name="Email" type="email" class="form-control" placeholder="you@example.com" required/>
+                        <div class="invalid-feedback">Укажите корректный email</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="regPassword">Пароль</label>
+                        <input id="regPassword" name="Password" type="password" class="form-control" minlength="6" required/>
+                        <div class="invalid-feedback">Минимум 6 символов</div>
+                    </div>
+                    <div>
+                        <label class="form-label" for="regConfirm">Подтверждение пароля</label>
+                        <input id="regConfirm" name="ConfirmPassword" type="password" class="form-control" minlength="6" required/>
+                        <div class="invalid-feedback">Повторите пароль</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Отмена</button>
+                    <button class="btn btn-primary" type="submit">Создать аккаунт</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+
+<script>
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
