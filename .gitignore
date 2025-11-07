@@ -396,5 +396,33 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# ── Build артефакты .NET (во всех подпапках/проектах)
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug*/
+**/[Rr]elease*/
+**/[Xx]64/
+**/[Xx]86/
+**/[Aa][Rr][Mm]*/
+**/publish/
+
+# ── IDE и локальные настройки
+.vs/
 .idea/
-WebPracticalProject.DAL/obj/Debug/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.DotSettings.user
+
+# ── Тесты/логирование/бенчмарки
+TestResults/
+**/TestResults/
+*.trx
+*.coverage*
+coverage/
+BenchmarkDotNet.Artifacts/
+*.log
+
+
