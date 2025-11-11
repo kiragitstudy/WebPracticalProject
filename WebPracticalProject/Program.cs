@@ -1,12 +1,29 @@
 using Microsoft.EntityFrameworkCore;
 using WebPracticalProject.DAL;
+using WebPracticalProject.DAL.Interfaces;
+using WebPracticalProject.DAL.Repositories;
+using WebPracticalProject.Service.Interfaces;
+using WebPracticalProject.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IInstrumentRepository, InstrumentRepository>();
+builder.Services.AddScoped<IRentalRepository, RentalRepository>();
+builder.Services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IInstrumentService, InstrumentService>();
+builder.Services.AddScoped<IRentalService, RentalService>();
+builder.Services.AddScoped<IContactService, ContactService>();
+
+
 
 var app = builder.Build();
 

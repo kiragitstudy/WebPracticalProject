@@ -31,6 +31,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         model.Entity<User>(e =>
         {
             e.ToTable("users");
+            e.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()").ValueGeneratedOnAdd();
+            e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
             e.Property(x => x.Email).IsRequired();
             e.Property(x => x.Role)
                 .HasConversion(roleConverter)
@@ -41,11 +43,21 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 "role IN ('customer','manager','admin')"));
         });
 
-        model.Entity<ContactMessage>().ToTable("contact_messages");
+        model.Entity<ContactMessage>(e =>
+        {
+            e.ToTable("contact_messages");
+            e.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()").ValueGeneratedOnAdd();
+            e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
+            e.Property(x => x.Email).IsRequired();
+            e.Property(x => x.Message).IsRequired();
+        });
 
         model.Entity<Instrument>(e =>
         {
             e.ToTable("instruments");
+            e.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()").ValueGeneratedOnAdd();
+            e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
+            e.Property(x => x.Title).IsRequired();
             e.HasIndex(x => x.Category);
             e.HasIndex(x => x.Brand);
             e.HasIndex(x => x.PricePerDay);
@@ -60,6 +72,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 tb.HasCheckConstraint("ck_rentals_status",
                     "status IN ('draft','active','closed','cancelled')");
             });
+            e.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()").ValueGeneratedOnAdd();
+            e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
 
             e.Property(x => x.Status)
                 .HasConversion(statusConverter)
