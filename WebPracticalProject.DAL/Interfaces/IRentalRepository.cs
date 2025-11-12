@@ -1,3 +1,4 @@
+using WebPracticalProject.Domain.Contracts;
 using WebPracticalProject.Domain.Rentals;
 
 namespace WebPracticalProject.DAL.Interfaces;

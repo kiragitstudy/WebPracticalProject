@@ -1,9 +1,6 @@
 using WebPracticalProject.Domain.Common;
 
-namespace WebPracticalProject.DAL;
-
-public sealed record CreateUserArgs(string Email, string? PasswordHash, string? DisplayName, UserRole Role);
-public sealed record UpdateUserArgs(string? DisplayName, UserRole? Role, bool? EmailConfirmed);
+namespace WebPracticalProject.Domain.Contracts;
 
 public sealed record CreateInstrumentArgs(string Title, string? Brand, string? Category, string? Description, string? ImageUrl, decimal PricePerDay, bool IsFeatured, bool IsActive);
 public sealed record UpdateInstrumentArgs(string? Title, string? Brand, string? Category, string? Description, string? ImageUrl, decimal? PricePerDay, bool? IsFeatured, bool? IsActive);

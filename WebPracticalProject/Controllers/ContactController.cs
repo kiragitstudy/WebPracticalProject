@@ -1,29 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
-using WebPracticalProject.DAL;
-using WebPracticalProject.Domain.Contacts;
+using WebPracticalProject.Service.Dto;
+using WebPracticalProject.Service.Interfaces;
 
 namespace WebPracticalProject.Controllers;
 
-public class ContactController(AppDbContext db) : Controller
+[AutoValidateAntiforgeryToken]
+public sealed class ContactController(IContactService contacts) : Controller
 {
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Send([FromBody] ContactForm? dto)
+    public async Task<IActionResult> Send([FromBody] ContactForm? dto, CancellationToken ct = default)
     {
         if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Message))
             return BadRequest(new { ok = false, message = "Заполните обязательные поля." });
 
-        var row = new ContactMessage {
-            Email = dto.Email!,
+        var id = await contacts.CreateAsync(new CreateContactDto
+        {
             Name = dto.Name,
+            Email = dto.Email!,
             Subject = dto.Subject,
-            Message = dto.Message!,
-            CreatedAt = DateTimeOffset.UtcNow
-        };
-        db.ContactMessages.Add(row);
-        await db.SaveChangesAsync();
+            Message = dto.Message!
+        }, ct);
 
-        return Json(new { ok = true, id = row.Id.ToString("N") });
+        return Json(new { ok = true, id = id.ToString("N") });
     }
 
     public sealed class ContactForm

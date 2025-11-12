@@ -1,4 +1,5 @@
 using WebPracticalProject.Domain.Catalog;
+using WebPracticalProject.Domain.Contracts;
 
 namespace WebPracticalProject.DAL.Interfaces;
 

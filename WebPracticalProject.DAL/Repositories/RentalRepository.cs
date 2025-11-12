@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebPracticalProject.DAL.Interfaces;
+using WebPracticalProject.Domain.Contracts;
 using WebPracticalProject.Domain.Rentals;
 
 namespace WebPracticalProject.DAL.Repositories;

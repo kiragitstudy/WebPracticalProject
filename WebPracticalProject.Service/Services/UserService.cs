@@ -1,5 +1,5 @@
-using WebPracticalProject.DAL;
 using WebPracticalProject.DAL.Interfaces;
+using WebPracticalProject.Domain.Users;
 using WebPracticalProject.Service.Dto;
 using WebPracticalProject.Service.Interfaces;
 
@@ -8,17 +8,15 @@ public sealed class UserService(IUserRepository repo) : IUserService
 {
     public async Task<UserVm> CreateAsync(CreateUserDto dto, CancellationToken ct)
     {
-        var id = await repo.CreateAsync(
-            new CreateUserArgs(dto.Email.Trim(), dto.Password /*hash тут*/, dto.DisplayName, dto.Role), ct);
-        var got = await repo.GetByIdAsync(id, ct)!;
-        return new UserVm { Id=got.Id, Email=got.Email, DisplayName=got.DisplayName, Role=got.Role.ToString().ToLower() };
+        var id = await repo.CreateAsync(new CreateUserArgs(dto.Email.Trim(), dto.Password /*hash тут*/, dto.DisplayName, dto.Role), ct);
+        var got = await repo.GetByIdAsync(id, ct);
+        return new UserVm { Id=got.Id, Email=got.Email, DisplayName=got.DisplayName, Role=got.Role };
     }
-    
     
     public async Task<UserVm?> GetAsync(Guid id, CancellationToken ct)
     {
         var u = await repo.GetByIdAsync(id, ct);
-        return u is null ? null : new UserVm { Id = u.Id, Email = u.Email, DisplayName = u.DisplayName, Role = u.Role.ToString().ToLower() };
+        return u is null ? null : new UserVm { Id = u.Id, Email = u.Email, DisplayName = u.DisplayName, Role = u.Role };
     }
 
     public async Task<PagedResult<UserVm>> ListAsync(int page, int size, CancellationToken ct)
@@ -27,7 +25,7 @@ public sealed class UserService(IUserRepository repo) : IUserService
         return new PagedResult<UserVm>
         {
             Page = page, Size = size, Total = total,
-            Items = items.Select(u => new UserVm { Id=u.Id, Email=u.Email, DisplayName=u.DisplayName, Role=u.Role.ToString().ToLower() }).ToList()
+            Items = items.Select(u => new UserVm { Id=u.Id, Email=u.Email, DisplayName=u.DisplayName, Role=u.Role }).ToList()
         };
     }
     

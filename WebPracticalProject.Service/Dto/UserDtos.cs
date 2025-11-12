@@ -2,6 +2,27 @@ using WebPracticalProject.Domain.Common;
 
 namespace WebPracticalProject.Service.Dto;
 
+public sealed class RegisterDto
+{
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+    public string? DisplayName { get; init; }
+}
+
+public sealed class LoginDto
+{
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+}
+
+public sealed class AuthUserVm
+{
+    public required Guid Id { get; init; }
+    public required string Email { get; init; }
+    public string? DisplayName { get; init; }
+    public required string Role { get; init; } // в нижнем регистре
+}
+
 public sealed class CreateUserDto
 {
     public required string Email { get; init; }
@@ -21,5 +42,5 @@ public sealed class UserVm
     public required Guid Id { get; init; }
     public required string Email { get; init; }
     public string? DisplayName { get; init; }
-    public string Role { get; init; } = "customer";
+    public UserRole Role { get; init; } = UserRole.Customer;
 }

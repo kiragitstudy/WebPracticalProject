@@ -1,6 +1,7 @@
 using WebPracticalProject.DAL;
 using WebPracticalProject.DAL.Interfaces;
 using WebPracticalProject.Domain.Catalog;
+using WebPracticalProject.Domain.Contracts;
 using WebPracticalProject.Service.Dto;
 using WebPracticalProject.Service.Interfaces;
 
