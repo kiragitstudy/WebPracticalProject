@@ -8,6 +8,9 @@ public class ContactMessage
 {
     [Column("id")]
     public Guid Id { get; set; }
+    
+    [Column("user_id")]
+    public Guid? UserId { get; set; }   
 
     [Column("name")]
     public string? Name { get; set; }

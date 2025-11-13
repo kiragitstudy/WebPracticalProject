@@ -8,4 +8,5 @@ public interface IContactService
     Task<ContactVm?> GetAsync(Guid id, CancellationToken ct);
     Task<PagedResult<ContactVm>> ListAsync(int page, int size, CancellationToken ct);
     Task DeleteAsync(Guid id, CancellationToken ct);
+    Task<PagedResult<ContactVm>> ListMineAsync(Guid userId, int page, int size, CancellationToken ct);
 }

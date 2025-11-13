@@ -24,11 +24,10 @@
         FetchHelpers.wireUpAjaxForm(loginForm, {
             onSuccess: (payload, form) => {
                 if (payload?.ok) {
-                    // Можно тут же обновить UI (кнопки «Войти/Регистрация» -> «Профиль/Выход») по payload.user
                     AppToast.show('Вход выполнен', `Добро пожаловать, ${payload.user?.displayName || 'пользователь'}!`);
-                    // Закрыть модалку
                     const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
                     modal?.hide();
+                    window.location.reload();
                 } else {
                     AppToast.show('Ошибка входа', payload?.message || 'Неверные данные', 'danger');
                 }
@@ -40,9 +39,9 @@
         FetchHelpers.wireUpAjaxForm(registerForm, {
             onSuccess: (payload, form) => {
                 if (payload?.ok) {
-                    AppToast.show('Аккаунт создан', 'Проверьте почту для подтверждения email.');
                     const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
                     modal?.hide();
+                    window.location.reload();
                 } else {
                     AppToast.show('Не удалось зарегистрировать', payload?.message || 'Попробуйте ещё раз', 'danger');
                 }

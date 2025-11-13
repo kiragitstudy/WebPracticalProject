@@ -1,6 +1,4 @@
-using WebPracticalProject.DAL;
 using WebPracticalProject.DAL.Interfaces;
-using WebPracticalProject.Domain.Contacts;
 using WebPracticalProject.Domain.Contracts;
 using WebPracticalProject.Service.Dto;
 using WebPracticalProject.Service.Interfaces;
@@ -26,7 +24,19 @@ public sealed class ContactService(IContactMessageRepository repo) : IContactSer
         return new PagedResult<ContactVm> {
             Page=page, Size=size, Total=total,
             Items = items.Select(x => new ContactVm {
-                Id=x.Id, Name=x.Name, Email=x.Email, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
+                Id=x.Id, UserId=x.UserId, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
+            }).ToList()
+        };
+    }
+
+    public async Task<PagedResult<ContactVm>> ListMineAsync(Guid userId, int page, int size, CancellationToken ct)
+    {
+        var (items, total) = await repo.GetPagedByUserAsync(userId, page, size, ct);
+        return new PagedResult<ContactVm>
+        {
+            Page=page, Size=size, Total=total,
+            Items = items.Select(x => new ContactVm {
+                Id=x.Id, UserId=x.UserId, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
             }).ToList()
         };
     }

@@ -50,6 +50,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
             e.Property(x => x.Email).IsRequired();
             e.Property(x => x.Message).IsRequired();
+            e.HasIndex(x => x.UserId);
         });
 
         model.Entity<Instrument>(e =>

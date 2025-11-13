@@ -6,7 +6,7 @@ namespace WebPracticalProject.DAL.Repositories;
 
 public sealed class UserRepository(AppDbContext db) : IUserRepository
 {
-    public async Task<Guid> CreateAsync(Domain.Users.CreateUserArgs a, CancellationToken ct)
+    public async Task<Guid> CreateAsync(CreateUserArgs a, CancellationToken ct)
     {
         var e = new User { Email=a.Email, PasswordHash=a.PasswordHash, DisplayName=a.DisplayName, Role=a.Role, EmailConfirmed=false };
         await db.Users.AddAsync(e, ct);
@@ -14,7 +14,7 @@ public sealed class UserRepository(AppDbContext db) : IUserRepository
         return e.Id;
     }
 
-    public async Task UpdateAsync(Guid id, Domain.Users.UpdateUserArgs a, CancellationToken ct)
+    public async Task UpdateAsync(Guid id, UpdateUserArgs a, CancellationToken ct)
     {
         var e = await db.Users.FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw new KeyNotFoundException("user");
         if (a.DisplayName is not null) e.DisplayName = a.DisplayName;

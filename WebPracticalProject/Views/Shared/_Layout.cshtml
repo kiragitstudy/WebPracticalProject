@@ -1,6 +1,9 @@
-﻿@*
-  Views/Shared/_Layout.cshtml
-*@
+﻿@using System.Security.Claims
+@{
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    var role = User?.FindFirstValue(ClaimTypes.Role);
+}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -38,12 +41,41 @@
                 </ul>
 
                 <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-                        <i class="bi bi-box-arrow-in-right me-1"></i> Войти
-                    </button>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
-                        <i class="bi bi-person-plus me-1"></i> Регистрация
-                    </button>
+                    @if (!isAuth)
+                    {
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Войти
+                        </button>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registerModal">
+                            <i class="bi bi-person-plus me-1"></i> Регистрация
+                        </button>
+                    }
+                    else
+                    {
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                @User.FindFirstValue(ClaimTypes.Email)
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Профиль</a></li>
+                                @if (role == "admin")
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">Пользователи</a></li>
+                                }
+                                @if (role == "admin" || role == "manager")
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Messages">Сообщения</a></li>
+                                }
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post" class="px-3 py-1">
+                                        @Html.AntiForgeryToken()
+                                        <button class="btn btn-link p-0">Выйти</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

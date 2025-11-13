@@ -1,0 +1,114 @@
+@model WebPracticalProject.Controllers.AccountController.ProfilePageVm
+@{
+    ViewData["Title"] = "Профиль";
+}
+
+<div class="container py-4">
+  <div class="d-flex align-items-center justify-content-between mb-4 pt-4">
+    <h1 class="h3 mb-0">Профиль</h1>
+    <span class="badge text-bg-secondary text-capitalize">@Model.Role</span>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Учётные данные</h2>
+          <dl class="row mb-0 small">
+            <dt class="col-4">Email</dt><dd class="col-8">@Model.Email</dd>
+            <dt class="col-4">Имя</dt><dd class="col-8">@Model.DisplayName</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Изменить имя</h2>
+          <form asp-action="UpdateProfile" asp-controller="Account" method="post" class="row g-3 needs-validation" novalidate>
+            @Html.AntiForgeryToken()
+            <div class="col-12">
+              <label class="form-label" for="displayName">Отображаемое имя</label>
+              <input id="displayName" name="DisplayName" type="text" class="form-control" value="@Model.DisplayName" minlength="2" required />
+              <div class="invalid-feedback">Минимум 2 символа</div>
+            </div>
+            <div class="col-12 d-flex gap-2">
+              <button class="btn btn-primary" type="submit">Сохранить</button>
+              <a class="btn btn-outline-secondary" asp-action="Profile">Сброс</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <h2 class="h5 mb-3 text-danger">Удалить аккаунт</h2>
+          <p class="text-body-secondary small mb-3">Действие необратимо. Сообщения останутся без привязки.</p>
+          <form asp-action="DeleteAccount" asp-controller="Account" method="post" class="row g-3">
+            @Html.AntiForgeryToken()
+            <div class="col-12">
+              <label class="form-label" for="delPass">Пароль</label>
+              <input id="delPass" name="Password" type="password" class="form-control" required />
+            </div>
+            <div class="col-12">
+              <button class="btn btn-outline-danger" type="submit">Удалить аккаунт</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h2 class="h5 mb-3">Мои обращения</h2>
+          @if (Model.Messages.Items.Any())
+          {
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead>
+                  <tr>
+                    <th>Дата</th>
+                    <th>Тема</th>
+                    <th>Сообщение</th>
+                  </tr>
+                </thead>
+                <tbody>
+                @foreach (var m in Model.Messages.Items)
+                {
+                  <tr>
+                    <td class="text-nowrap">@m.CreatedAt.LocalDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@(string.IsNullOrWhiteSpace(m.Subject) ? "—" : m.Subject)</td>
+                    <td class="text-truncate" style="max-width:380px">@m.Message</td>
+                  </tr>
+                }
+                </tbody>
+              </table>
+            </div>
+
+            <nav>
+              <ul class="pagination mb-0">
+                @{
+                  var p = Model.Messages.Page;
+                  var total = Model.Messages.Total;
+                  var size = Model.Messages.Size;
+                  var pages = Math.Max(1, (int)Math.Ceiling((double)total / size));
+                }
+                <li class="page-item @(p<=1?"disabled":null)">
+                  <a class="page-link" href="@Url.Action("Profile", new { page = p-1, size })">Назад</a>
+                </li>
+                <li class="page-item disabled"><span class="page-link">@p / @pages</span></li>
+                <li class="page-item @(p>=pages?"disabled":null)">
+                  <a class="page-link" href="@Url.Action("Profile", new { page = p+1, size })">Вперёд</a>
+                </li>
+              </ul>
+            </nav>
+          }
+          else
+          {
+            <div class="alert alert-info mb-0">Вы ещё не отправляли сообщений.</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

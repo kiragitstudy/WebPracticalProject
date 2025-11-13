@@ -56,4 +56,13 @@ public sealed class AuthService(IUserRepository users, IPasswordService password
             Role = u.Role.ToString().ToLower()
         };
     }
+    
+    public async Task DeleteSelfAsync(Guid userId, string password, CancellationToken ct)
+    {
+        var u = await users.GetByIdAsync(userId, ct) ?? throw new UnauthorizedAccessException();
+        if (string.IsNullOrEmpty(u.PasswordHash) || !passwords.Verify(password, u.PasswordHash))
+            throw new UnauthorizedAccessException();
+
+        await users.DeleteAsync(userId, ct);
+    }
 }

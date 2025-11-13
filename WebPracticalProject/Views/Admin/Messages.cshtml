@@ -1,0 +1,54 @@
+@model WebPracticalProject.Service.Dto.PagedResult<WebPracticalProject.Service.Dto.ContactVm>
+@{
+  ViewData["Title"] = "Сообщения";
+}
+<div class="container py-4">
+  <h1 class="h3 mb-4">Входящие сообщения</h1>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Автор</th>
+          <th>Тема</th>
+          <th>Сообщение</th>
+          <th class="text-end">Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+      @foreach (var m in Model.Items)
+      {
+        <tr>
+          <td class="text-nowrap">@m.CreatedAt.LocalDateTime.ToString("dd.MM.yyyy HH:mm")</td>
+          <td>
+            @if (m.UserId.HasValue)
+            {
+              <span class="badge text-bg-light">user</span>
+            }
+            @m.Email
+          </td>
+          <td>@(string.IsNullOrWhiteSpace(m.Subject) ? "—" : m.Subject)</td>
+          <td class="text-truncate" style="max-width:460px">@m.Message</td>
+          <td class="text-end">
+            <form asp-action="DeleteMessage" asp-controller="Admin" method="post" onsubmit="return confirm('Удалить сообщение?')" class="d-inline">
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="id" value="@m.Id" />
+              <button class="btn btn-sm btn-outline-danger" type="submit">Удалить</button>
+            </form>
+          </td>
+        </tr>
+      }
+      </tbody>
+    </table>
+  </div>
+  @{
+    var p = Model.Page; var total = Model.Total; var size = Model.Size; var pages = Math.Max(1, (int)Math.Ceiling((double)total/size));
+  }
+  <nav>
+    <ul class="pagination">
+      <li class="page-item @(p<=1?"disabled":null)"><a class="page-link" href="@Url.Action("Messages", new { page = p-1, size })">Назад</a></li>
+      <li class="page-item disabled"><span class="page-link">@p / @pages</span></li>
+      <li class="page-item @(p>=pages?"disabled":null)"><a class="page-link" href="@Url.Action("Messages", new { page = p+1, size })">Вперёд</a></li>
+    </ul>
+  </nav>
+</div>

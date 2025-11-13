@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using WebPracticalProject.Common;
 using WebPracticalProject.Service.Dto;
 using WebPracticalProject.Service.Interfaces;
 
@@ -8,13 +9,14 @@ namespace WebPracticalProject.Controllers;
 public sealed class ContactController(IContactService contacts) : Controller
 {
     [HttpPost]
+    [AutoValidateAntiforgeryToken]
     public async Task<IActionResult> Send([FromBody] ContactForm? dto, CancellationToken ct = default)
     {
         if (dto == null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Message))
             return BadRequest(new { ok = false, message = "Заполните обязательные поля." });
 
-        var id = await contacts.CreateAsync(new CreateContactDto
-        {
+        var id = await contacts.CreateAsync(new CreateContactDto {
+            UserId = User.GetUserId(),
             Name = dto.Name,
             Email = dto.Email!,
             Subject = dto.Subject,

@@ -62,3 +62,7 @@ CREATE TABLE IF NOT EXISTS app.rentals (
 CREATE INDEX IF NOT EXISTS ix_rentals_user ON app.rentals(user_id);
 CREATE INDEX IF NOT EXISTS ix_rentals_instr ON app.rentals(instrument_id);
 CREATE INDEX IF NOT EXISTS ix_rentals_status ON app.rentals(status);
+
+ALTER TABLE app.contact_messages
+    ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES app.users(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS ix_contact_messages_user ON app.contact_messages(user_id);
