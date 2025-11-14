@@ -9,7 +9,10 @@ public sealed class InstrumentRepository(AppDbContext db) : IInstrumentRepositor
 {
     public async Task<Guid> CreateAsync(CreateInstrumentArgs a, CancellationToken ct)
     {
-        var e = new Instrument { Title=a.Title, Brand=a.Brand, Category=a.Category, Description=a.Description, ImageUrl=a.ImageUrl, PricePerDay=a.PricePerDay, IsFeatured=a.IsFeatured, IsActive=a.IsActive };
+        var e = new Instrument { Title=a.Title, Brand=a.Brand, 
+            Category=a.Category, Description=a.Description, 
+            ImageUrl=a.ImageUrl, PricePerDay=a.PricePerDay, 
+            IsFeatured=a.IsFeatured, IsActive=a.IsActive };
         await db.Instruments.AddAsync(e, ct);
         await db.SaveChangesAsync(ct);
         return e.Id;

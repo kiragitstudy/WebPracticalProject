@@ -24,19 +24,19 @@ public sealed class ContactService(IContactMessageRepository repo) : IContactSer
         return new PagedResult<ContactVm> {
             Page=page, Size=size, Total=total,
             Items = items.Select(x => new ContactVm {
-                Id=x.Id, UserId=x.UserId, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
+                Id=x.Id, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
             }).ToList()
         };
     }
 
-    public async Task<PagedResult<ContactVm>> ListMineAsync(Guid userId, int page, int size, CancellationToken ct)
+    public async Task<PagedResult<ContactVm>> ListMineAsync(string? email, int page, int size, CancellationToken ct)
     {
-        var (items, total) = await repo.GetPagedByUserAsync(userId, page, size, ct);
+        var (items, total) = await repo.GetPagedByUserAsync(email, page, size, ct);
         return new PagedResult<ContactVm>
         {
             Page=page, Size=size, Total=total,
             Items = items.Select(x => new ContactVm {
-                Id=x.Id, UserId=x.UserId, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
+                Id=x.Id, Email=x.Email, Name=x.Name, Subject=x.Subject, Message=x.Message, CreatedAt=x.CreatedAt
             }).ToList()
         };
     }

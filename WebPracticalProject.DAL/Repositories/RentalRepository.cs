@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebPracticalProject.DAL.Interfaces;
+using WebPracticalProject.Domain.Common;
 using WebPracticalProject.Domain.Contracts;
 using WebPracticalProject.Domain.Rentals;
 
@@ -14,6 +15,14 @@ public sealed class RentalRepository(AppDbContext db) : IRentalRepository
         await db.SaveChangesAsync(ct);
         return e.Id;
     }
+    
+    public async Task<bool> ExistsOverlapAsync(Guid instrumentId, DateTimeOffset start, DateTimeOffset end, CancellationToken ct)
+    {
+        return await db.Rentals.AsNoTracking()
+            .Where(r => r.InstrumentId == instrumentId && (r.Status == RentalStatus.Active || r.Status == RentalStatus.Draft))
+            .AnyAsync(r => !(r.EndAt <= start || r.StartAt >= end), ct);
+    }
+
 
     public async Task UpdateAsync(Guid id, UpdateRentalArgs a, CancellationToken ct)
     {
@@ -35,9 +44,17 @@ public sealed class RentalRepository(AppDbContext db) : IRentalRepository
     public Task<Rental?> GetByIdAsync(Guid id, CancellationToken ct) =>
         db.Rentals.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, ct);
 
-    public async Task<(IReadOnlyList<Rental>, int)> GetPagedAsync(int page,int size,CancellationToken ct)
+    public async Task<(IReadOnlyList<Rental>, int)> GetPagedAsync(int page, int size, CancellationToken ct)
     {
         var q = db.Rentals.AsNoTracking().OrderByDescending(x => x.CreatedAt);
+        var total = await q.CountAsync(ct);
+        var items = await q.Skip((page-1)*size).Take(size).ToListAsync(ct);
+        return (items,total);
+    }
+    
+    public async Task<(IReadOnlyList<Rental>,int)> GetPagedByUserAsync(Guid userId, int page, int size, CancellationToken ct)
+    {
+        var q = db.Rentals.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.CreatedAt);
         var total = await q.CountAsync(ct);
         var items = await q.Skip((page-1)*size).Take(size).ToListAsync(ct);
         return (items,total);

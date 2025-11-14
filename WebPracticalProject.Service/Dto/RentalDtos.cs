@@ -27,4 +27,5 @@ public sealed class RentalVm
     public required DateTimeOffset EndAt { get; init; }
     public required string Status { get; init; }
     public decimal? TotalAmount { get; init; }
+    public required DateTimeOffset CreatedAt { get; init; }
 }

@@ -20,13 +20,7 @@
       {
         <tr>
           <td class="text-nowrap">@m.CreatedAt.LocalDateTime.ToString("dd.MM.yyyy HH:mm")</td>
-          <td>
-            @if (m.UserId.HasValue)
-            {
-              <span class="badge text-bg-light">user</span>
-            }
-            @m.Email
-          </td>
+          <td>@m.Email</td>
           <td>@(string.IsNullOrWhiteSpace(m.Subject) ? "—" : m.Subject)</td>
           <td class="text-truncate" style="max-width:460px">@m.Message</td>
           <td class="text-end">

@@ -1,0 +1,143 @@
+@using WebPracticalProject.Controllers
+@using WebPracticalProject.Service.Dto
+@model RentalsController.CreateRentalPageVm
+
+@{
+    ViewData["Title"] = "Аренда — " + Model.Instrument.Title;
+    var isAuth = User?.Identity?.IsAuthenticated ?? false;
+    string fmt(DateTimeOffset? dt) => dt?.LocalDateTime.ToString("yyyy-MM-ddTHH:mm") ?? "";
+    var minNow = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+}
+
+<div class="container py-4">
+  <h1 class="h3 mb-3">Оформление аренды: @Model.Instrument.Title</h1>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      @* Карточка инструмента *@
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="d-flex gap-3">
+            <div class="ratio ratio-4x3" style="width: 220px; max-width: 40%;">
+              <img src="@(Model.Instrument.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")"
+                   alt="@Model.Instrument.Title"
+                   class="rounded w-100 h-100 object-fit-cover" />
+            </div>
+            <div class="flex-grow-1">
+              <div class="small text-body-secondary mb-1">
+                @(Model.Instrument.Brand ?? "—") · @(Model.Instrument.Category ?? "—")
+              </div>
+              <div class="mb-2">Цена/сутки: <span class="fw-semibold">@Model.Instrument.PricePerDay.ToString("0.##")</span></div>
+              <div>
+                @if (Model.Instrument.IsActive) { <span class="badge text-bg-success">доступен</span> } else { <span class="badge text-bg-secondary">скрыт</span> }
+                @if (Model.Instrument.IsFeatured) { <span class="badge text-bg-info ms-1">popular</span> }
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 mb-0">@(Model.Instrument.Description ?? "Описание будет позже.")</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      @if (!isAuth)
+      {
+        <div class="alert alert-warning">
+          Для оформления аренды войдите в аккаунт.
+          <button class="btn btn-sm btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#loginModal">Войти</button>
+          <button class="btn btn-sm btn-outline-primary ms-1" data-bs-toggle="modal" data-bs-target="#registerModal">Регистрация</button>
+        </div>
+      }
+      else
+      {
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <h2 class="h5 mb-3">Параметры аренды</h2>
+
+            <form asp-action="Create" asp-controller="Rentals" method="post" class="row g-3 needs-validation" novalidate>
+              @Html.AntiForgeryToken()
+              <input type="hidden" name="InstrumentId" value="@Model.Instrument.Id" />
+
+              <div class="col-md-6">
+                <label class="form-label" for="startAt">Начало</label>
+                <input id="startAt" name="StartAt" type="datetime-local" class="form-control"
+                       value="@fmt(Model.StartAt)" min="@minNow" required />
+                <div class="invalid-feedback">Укажи дату начала</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label" for="endAt">Окончание</label>
+                <input id="endAt" name="EndAt" type="datetime-local" class="form-control"
+                       value="@fmt(Model.EndAt)" min="@minNow" required />
+                <div class="invalid-feedback">Укажи дату окончания</div>
+              </div>
+
+              <div class="col-12">
+                <div class="p-3 rounded bg-light border">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                      <div class="small text-body-secondary">Предварительный расчёт</div>
+                      <div class="fw-semibold">
+                        <span id="estDays">—</span> сут. × @Model.Instrument.PricePerDay.ToString("0.##") = <span id="estTotal">—</span>
+                      </div>
+                    </div>
+                    <div class="small text-body-secondary">Фактическая сумма фиксируется при создании</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <button class="btn btn-primary" type="submit">Забронировать</button>
+                <a class="btn btn-outline-secondary" asp-controller="Catalog" asp-action="Index">Отмена</a>
+              </div>
+
+              @if (!ViewData.ModelState.IsValid)
+              {
+                <div class="col-12">
+                  <div class="alert alert-danger">
+                    @(ViewData.ModelState[string.Empty]?.Errors.FirstOrDefault()?.ErrorMessage ?? "Проверьте введённые данные.")
+                  </div>
+                </div>
+              }
+            </form>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+<script>
+(function(){
+  const pricePerDay = @Model.Instrument.PricePerDay.ToString(System.Globalization.CultureInfo.InvariantCulture);
+  const startEl = document.getElementById('startAt');
+  const endEl = document.getElementById('endAt');
+  const estDaysEl = document.getElementById('estDays');
+  const estTotalEl = document.getElementById('estTotal');
+
+  function ceilDays(ms){
+    if (ms <= 0) return 1;
+    const days = ms / (1000*60*60*24);
+    return Math.max(1, Math.ceil(days));
+  }
+
+  function recalc(){
+    if (!startEl || !endEl) return;
+    const s = new Date(startEl.value);
+    const e = new Date(endEl.value);
+    if (isNaN(s.getTime()) || isNaN(e.getTime())) { estDaysEl.textContent = '—'; estTotalEl.textContent = '—'; return; }
+    const ms = e - s;
+    const days = ceilDays(ms);
+    const total = (days * pricePerDay);
+    estDaysEl.textContent = days.toString();
+    estTotalEl.textContent = total.toLocaleString(undefined, { maximumFractionDigits: 2 });
+  }
+
+  startEl?.addEventListener('change', recalc);
+  endEl?.addEventListener('change', recalc);
+  recalc();
+})();
+</script>
+}

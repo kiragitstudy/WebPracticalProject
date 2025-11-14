@@ -9,5 +9,5 @@ public interface IContactMessageRepository
     Task DeleteAsync(Guid id, CancellationToken ct);
     Task<ContactMessage?> GetByIdAsync(Guid id, CancellationToken ct);
     Task<(IReadOnlyList<ContactMessage> Items, int Total)> GetPagedAsync(int page, int size, CancellationToken ct); // админ/модер
-    Task<(IReadOnlyList<ContactMessage> Items,int Total)> GetPagedByUserAsync(Guid userId, int page, int size, CancellationToken ct); // профиль юзера
+    Task<(IReadOnlyList<ContactMessage> Items,int Total)> GetPagedByUserAsync(string? email, int page, int size, CancellationToken ct); // профиль юзера
 }

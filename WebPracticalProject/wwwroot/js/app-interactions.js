@@ -76,6 +76,7 @@
         }
 
         function renderCard(item) {
+            const id = item.id;
             const title = escapeHtml(item.title || 'Позиция каталога');
             const img = item.img || 'https://via.placeholder.com/800x600?text=No+Image';
             const price = item.priceFrom != null ? `Посуточно от ${item.priceFrom} €` : 'Цена по запросу';
@@ -90,8 +91,8 @@
               <h3 class="h5 card-title">${title}</h3>
               <p class="text-body-secondary small flex-grow-1">${price} · Залог по договору</p>
               <div class="d-flex gap-2">
-                <a class="btn btn-primary" href="/Catalog/Details">Подробнее</a>
-                <a class="btn btn-outline-primary" href="/Orders/Create">В прокат</a>
+                <a class="btn btn-primary" href="/Catalog/Details/${id}">Подробнее</a>
+                <a class="btn btn-outline-primary" href="/Rentals/Create?instrumentId=${id}">В прокат</a>
               </div>
             </div>
           </div>

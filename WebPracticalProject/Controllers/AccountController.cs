@@ -101,7 +101,7 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
         var vm = await users.GetAsync(userId, ct);
         if (vm is null) return NotFound();
     
-        var msgs = await contacts.ListMineAsync(userId, page, size, ct);
+        var msgs = await contacts.ListMineAsync(User.GetEmail(), page, size, ct);
     
         var model = new ProfilePageVm
         {
@@ -153,8 +153,8 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
         {
             new(ClaimTypes.NameIdentifier, vm.Id.ToString("D")),
             new(ClaimTypes.Email, vm.Email),
-            new(ClaimTypes.Name, vm.Email),               // можно отобразить email в UI
-            new(ClaimTypes.Role, vm.Role)                 // "customer|manager|admin"
+            new(ClaimTypes.Name, vm.Email),
+            new(ClaimTypes.Role, vm.Role) // "customer|manager|admin"
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -180,11 +180,4 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
     public sealed class RegisterRequest { public string? DisplayName { get; set; } public string? Email { get; set; } public string? Password { get; set; } public string? ConfirmPassword { get; set; } }
     public sealed class UpdateProfileRequest { public string? DisplayName { get; set; } }
     public sealed class DeleteAccountRequest { public string? Password { get; set; } }
-
-    public sealed class ProfileVm
-    {
-        public required string Email { get; set; } 
-        public string? DisplayName { get; set; } 
-        public required UserRole Role { get; set; }
-    }
 }

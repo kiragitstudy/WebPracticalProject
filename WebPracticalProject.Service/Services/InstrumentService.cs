@@ -15,8 +15,8 @@ public sealed class InstrumentService(IInstrumentRepository repo) : IInstrumentS
         var id = await repo.CreateAsync(new CreateInstrumentArgs(
             dto.Title.Trim(), dto.Brand, dto.Category, dto.Description, dto.ImageUrl, dto.PricePerDay, dto.IsFeatured, dto.IsActive
         ), ct);
-        var m = await repo.GetByIdAsync(id, ct)!;
-        return new InstrumentVm { Id=m.Id, Title=m.Title, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, ImageUrl=m.ImageUrl };
+        var m = await repo.GetByIdAsync(id, ct);
+        return new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl };
     }
 
     public Task UpdateAsync(Guid id, UpdateInstrumentDto dto, CancellationToken ct) =>
@@ -25,7 +25,7 @@ public sealed class InstrumentService(IInstrumentRepository repo) : IInstrumentS
     public async Task<InstrumentVm?> GetAsync(Guid id, CancellationToken ct)
     {
         var m = await repo.GetByIdAsync(id, ct);
-        return m is null ? null : new InstrumentVm { Id=m.Id, Title=m.Title, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, ImageUrl=m.ImageUrl };
+        return m is null ? null : new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl };
     }
 
     public async Task<PagedResult<InstrumentVm>> ListAsync(string? category, int page, int size, CancellationToken ct)
@@ -34,7 +34,7 @@ public sealed class InstrumentService(IInstrumentRepository repo) : IInstrumentS
         return new PagedResult<InstrumentVm>
         {
             Page = page, Size = size, Total = total,
-            Items = items.Select(m => new InstrumentVm { Id=m.Id, Title=m.Title, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, ImageUrl=m.ImageUrl }).ToList()
+            Items = items.Select(m => new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl }).ToList()
         };
     }
 

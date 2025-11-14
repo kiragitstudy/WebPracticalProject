@@ -50,7 +50,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
             e.Property(x => x.Email).IsRequired();
             e.Property(x => x.Message).IsRequired();
-            e.HasIndex(x => x.UserId);
+            e.HasIndex(x => x.Email);
         });
 
         model.Entity<Instrument>(e =>
@@ -76,6 +76,10 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.Property(x => x.Id).HasDefaultValueSql("gen_random_uuid()").ValueGeneratedOnAdd();
             e.Property(x => x.CreatedAt).HasDefaultValueSql("now()").ValueGeneratedOnAdd();
 
+            e.Property(x => x.StartAt).HasColumnType("timestamptz");
+            e.Property(x => x.EndAt).HasColumnType("timestamptz");
+            e.Property(x => x.CreatedAt).HasColumnType("timestamptz");
+            
             e.Property(x => x.Status)
                 .HasConversion(statusConverter)
                 .HasColumnType("text");

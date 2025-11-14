@@ -1,0 +1,66 @@
+@using WebPracticalProject.Service.Dto
+@model PagedResult<InstrumentVm>
+@{
+    ViewData["Title"] = "Каталог";
+    var category = ViewBag.Category as string;
+    int p = Model.Page, size = Model.Size, total = Model.Total;
+    int pages = Math.Max(1, (int)Math.Ceiling((double)total/size));
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Каталог</h1>
+
+        <form method="get" class="d-flex gap-2" asp-controller="Catalog" asp-action="Index">
+            <input type="text" name="category" class="form-control" placeholder="Категория (guitar, drums…)" value="@(category ?? "")" />
+            <button class="btn btn-outline-primary" type="submit">Фильтр</button>
+        </form>
+    </div>
+
+    @if (!Model.Items.Any())
+    {
+    <div class="alert alert-info">Позиции не найдены.</div>
+    }
+    else
+    {
+    <div class="row g-4">
+        @foreach (var i in Model.Items)
+        {
+        <div class="col-sm-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="ratio ratio-4x3">
+                    <img src="@(i.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")" class="card-img-top object-fit-cover" alt="@i.Title" />
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <h3 class="h5 card-title">@i.Title</h3>
+                    <div class="small text-body-secondary mb-2">
+                        @(i.Brand ?? "—") · @(i.Category ?? "—")
+                    </div>
+                    <p class="text-body-secondary small flex-grow-1 mb-3">
+                        Посуточно от @i.PricePerDay.ToString("0.##")
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-primary" asp-controller="Catalog" asp-action="Details" asp-route-id="@i.Id">Подробнее</a>
+                        <a class="btn btn-outline-primary" asp-controller="Rentals" asp-action="Create" asp-route-instrumentId="@i.Id">В прокат</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination">
+            <li class="page-item @(p<=1?"disabled":null)">
+                <a class="page-link" href="@Url.Action("Index", new { category, page = p-1, size })">Назад</a>
+            </li>
+            <li class="page-item disabled">
+                <span class="page-link">@p / @pages</span>
+            </li>
+            <li class="page-item @(p>=pages?"disabled":null)">
+                <a class="page-link" href="@Url.Action("Index", new { category, page = p+1, size })">Вперёд</a>
+            </li>
+        </ul>
+    </nav>
+    }
+</div>

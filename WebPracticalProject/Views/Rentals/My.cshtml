@@ -1,0 +1,99 @@
+@using WebPracticalProject.Service.Dto
+@model WebPracticalProject.Controllers.RentalsController.MyPageVm
+
+@{
+    ViewData["Title"] = "Мои аренды";
+
+    var p = Model.Rentals.Page;
+    var size = Model.Rentals.Size;
+    var total = Model.Rentals.Total;
+    var pages = Math.Max(1, (int)Math.Ceiling((double)total / size));
+
+    string FDate(DateTimeOffset? dto)
+        => dto?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "—";
+
+    string FBage(string status) {
+        status = (status ?? "").ToLowerInvariant();
+        return status switch {
+            "active"    => "<span class=\"badge text-bg-success\">active</span>",
+            "closed"    => "<span class=\"badge text-bg-dark\">closed</span>",
+            "cancelled" => "<span class=\"badge text-bg-danger\">cancelled</span>",
+            _           => "<span class=\"badge text-bg-secondary\">draft</span>"
+        };
+    }
+}
+
+<div class="container py-4">
+  <h1 class="h3 mb-4">Мои аренды</h1>
+
+  @if (!Model.Rentals.Items.Any())
+  {
+      <div class="alert alert-info">Аренд пока нет.</div>
+  }
+  else
+  {
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th class="w-30">Период</th>
+            <th>Инструмент</th>
+            <th class="text-nowrap">Статус</th>
+            <th class="text-nowrap">Сумма</th>
+            <th class="text-nowrap">Создано</th>
+          </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in Model.Rentals.Items)
+        {
+            var hasInst = Model.Instruments.TryGetValue(r.InstrumentId, out var inst);
+            <tr>
+              <td class="text-nowrap">
+                @FDate(r.StartAt) — @FDate(r.EndAt)
+              </td>
+              <td>
+                @if (hasInst)
+                {
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="ratio ratio-4x3" style="width:64px">
+                            <img class="rounded object-fit-cover w-100 h-100"
+                                 src="@(inst!.ImageUrl ?? "https://via.placeholder.com/160x120?text=No+Image")"
+                                 alt="@inst.Title" />
+                        </div>
+                        <div>
+                            <a asp-controller="Catalog" asp-action="Details" asp-route-id="@inst.Id" class="fw-semibold">@inst.Title</a>
+                            <div class="small text-body-secondary">
+                                @(inst.Brand ?? "—") · @(inst.Category ?? "—")
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Catalog" asp-action="Details" asp-route-id="@r.InstrumentId">@r.InstrumentId</a>
+                }
+              </td>
+              <td class="text-nowrap">@Html.Raw(FBage(r.Status))</td>
+              <td class="text-nowrap">@((r.TotalAmount ?? 0m).ToString("N2"))</td>
+              <td class="text-nowrap">@FDate(r.CreatedAt)</td>
+            </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="mt-3">
+      <ul class="pagination">
+        <li class="page-item @(p<=1?"disabled":null)">
+          <a class="page-link" href="@Url.Action("My", new { page = p-1, size })">Назад</a>
+        </li>
+        <li class="page-item disabled">
+          <span class="page-link">@p / @pages</span>
+        </li>
+        <li class="page-item @(p>=pages?"disabled":null)">
+          <a class="page-link" href="@Url.Action("My", new { page = p+1, size })">Вперёд</a>
+        </li>
+      </ul>
+    </nav>
+  }
+</div>

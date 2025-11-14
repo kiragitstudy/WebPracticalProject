@@ -33,9 +33,9 @@ public sealed class ContactMessageRepository(AppDbContext db) : IContactMessageR
         return (items,total);
     }
 
-    public async Task<(IReadOnlyList<ContactMessage>, int)> GetPagedByUserAsync(Guid userId, int page, int size, CancellationToken ct)
+    public async Task<(IReadOnlyList<ContactMessage>, int)> GetPagedByUserAsync(string? email, int page, int size, CancellationToken ct)
     {
-        var q = db.ContactMessages.AsNoTracking().Where(x => x.UserId == userId).OrderByDescending(x => x.CreatedAt);
+        var q = db.ContactMessages.AsNoTracking().Where(x => x.Email == email).OrderByDescending(x => x.CreatedAt);
         var total = await q.CountAsync(ct);
         var items = await q.Skip((page-1)*size).Take(size).ToListAsync(ct);
         return (items,total);

@@ -21,9 +21,33 @@ public sealed class RentalService(IRentalRepository rentals, IInstrumentReposito
             new CreateRentalArgs(dto.UserId, dto.InstrumentId, dto.StartAt, dto.EndAt, instr.PricePerDay * days), ct);
 
         var r = await rentals.GetByIdAsync(id, ct)!;
-        return new RentalVm { Id=r.Id, UserId=r.UserId, InstrumentId=r.InstrumentId, StartAt=r.StartAt, EndAt=r.EndAt, Status=r.Status.ToString().ToLower(), TotalAmount=r.TotalAmount };
+        return new RentalVm { Id=r.Id, UserId=r.UserId,
+            InstrumentId=r.InstrumentId, StartAt=r.StartAt, 
+            EndAt=r.EndAt, Status=r.Status.ToString().ToLower(), 
+            TotalAmount=r.TotalAmount,
+            CreatedAt = r.CreatedAt };
     }
 
+    public async Task<PagedResult<RentalVm>> ListMineAsync(Guid userId, int page, int size, CancellationToken ct)
+    {
+        var (items, total) = await rentals.GetPagedByUserAsync(userId, page, size, ct);
+        return new PagedResult<RentalVm>
+        {
+            Page = page, Size = size, Total = total,
+            Items = items.Select(r => new RentalVm
+            {
+                Id = r.Id,
+                UserId = r.UserId,
+                InstrumentId = r.InstrumentId,
+                StartAt = r.StartAt,
+                EndAt = r.EndAt,
+                Status = r.Status.ToString().ToLower(),
+                TotalAmount = r.TotalAmount,
+                CreatedAt = r.CreatedAt
+            }).ToList()
+        };
+    }
+    
     public Task UpdateAsync(Guid id, UpdateRentalDto dto, CancellationToken ct) =>
         rentals.UpdateAsync(id, new UpdateRentalArgs(dto.StartAt, dto.EndAt, dto.Status, dto.TotalAmount), ct);
 
@@ -35,7 +59,8 @@ public sealed class RentalService(IRentalRepository rentals, IInstrumentReposito
             Id = r.Id, UserId = r.UserId, InstrumentId = r.InstrumentId,
             StartAt = r.StartAt, EndAt = r.EndAt,
             Status = r.Status.ToString().ToLower(),
-            TotalAmount = r.TotalAmount
+            TotalAmount = r.TotalAmount,
+            CreatedAt = r.CreatedAt
         };
     }
 
@@ -48,7 +73,8 @@ public sealed class RentalService(IRentalRepository rentals, IInstrumentReposito
             Items = items.Select(r => new RentalVm {
                 Id=r.Id, UserId=r.UserId, InstrumentId=r.InstrumentId,
                 StartAt=r.StartAt, EndAt=r.EndAt, Status=r.Status.ToString().ToLower(),
-                TotalAmount=r.TotalAmount
+                TotalAmount=r.TotalAmount,
+                CreatedAt = r.CreatedAt
             }).ToList()
         };
     }

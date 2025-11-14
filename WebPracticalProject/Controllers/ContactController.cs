@@ -16,7 +16,6 @@ public sealed class ContactController(IContactService contacts) : Controller
             return BadRequest(new { ok = false, message = "Заполните обязательные поля." });
 
         var id = await contacts.CreateAsync(new CreateContactDto {
-            UserId = User.GetUserId(),
             Name = dto.Name,
             Email = dto.Email!,
             Subject = dto.Subject,
