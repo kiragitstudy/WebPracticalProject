@@ -111,5 +111,19 @@
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             }[m]));
         }
+
+        const rentalForm = document.querySelector('#rentalForm');
+        FetchHelpers.wireUpAjaxForm(rentalForm, {
+            onSuccess: (payload, form) => {
+                if (payload?.ok) {
+                    AppToast.show('Аренда оформлена', 'Бронирование создано.');
+                    window.location.href = payload.redirectUrl || '/Rentals/My';
+                } else {
+                    const msg = payload?.message || 'Не удалось оформить аренду';
+                    AppToast.show('Ошибка', msg, 'danger');
+                }
+            }
+        });
+
     });
 })();

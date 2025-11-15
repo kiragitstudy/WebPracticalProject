@@ -21,7 +21,6 @@ public sealed class RentalsController(IRentalService rentals, IInstrumentService
         return View(new CreateRentalPageVm
         {
             Instrument = inst,
-            // можно сразу подставить рекомендуемые даты
             StartAt = DateTimeOffset.Now.AddHours(1),
             EndAt   = DateTimeOffset.Now.AddDays(1)
         });
@@ -29,36 +28,72 @@ public sealed class RentalsController(IRentalService rentals, IInstrumentService
 
     [HttpPost]
     [Authorize]
-    public async Task<IActionResult> Create([FromForm] CreateRentalForm form, CancellationToken ct)
+    public async Task<IActionResult> Create([FromBody] CreateRentalForm? dto, CancellationToken ct)
     {
-        var startUtc = form.StartAt.ToUniversalTime();
-        var endUtc   = form.EndAt.ToUniversalTime();
-        if (startUtc >= endUtc)
+        if (dto is null)
         {
-            ModelState.AddModelError("", "Дата окончания должна быть позже даты начала.");
-            var inst = await instruments.GetAsync(form.InstrumentId, ct);
-            if (inst is null) return NotFound();
-            return View(new CreateRentalPageVm { Instrument = inst, StartAt = form.StartAt, EndAt = form.EndAt });
+            return BadRequest(new
+            {
+                ok = false,
+                message = "Пустое тело запроса."
+            });
         }
-
+    
+        // Стандартная проверка модели — как в Register
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key.Contains('.')
+                        ? kvp.Key.Split('.').Last()
+                        : kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+    
+            return BadRequest(new { ok = false, errors });
+        }
+    
+        var instrument = await instruments.GetAsync(dto.InstrumentId, ct);
+        if (instrument is null)
+        {
+            return NotFound(new
+            {
+                ok = false,
+                message = "Инструмент не найден или недоступен."
+            });
+        }
+    
+        var startUtc = dto.StartAt.ToUniversalTime();
+        var endUtc   = dto.EndAt.ToUniversalTime();
+    
         try
         {
             await rentals.CreateAsync(new CreateRentalDto
             {
                 UserId       = User.GetUserId()!.Value,
-                InstrumentId = form.InstrumentId,
-                StartAt      = startUtc, 
+                InstrumentId = dto.InstrumentId,
+                StartAt      = startUtc,
                 EndAt        = endUtc
             }, ct);
-
-            return RedirectToAction(nameof(My));
+    
+            return Json(new { ok = true });
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            ModelState.AddModelError("", ex.Message);
-            var inst = await instruments.GetAsync(form.InstrumentId, ct);
-            if (inst is null) return NotFound();
-            return View(new CreateRentalPageVm { Instrument = inst, StartAt = form.StartAt, EndAt = form.EndAt });
+            return BadRequest(new
+            {
+                ok = false,
+                message = ex.Message
+            });
+        }
+        catch (Exception)
+        {
+            return BadRequest(new
+            {
+                ok = false,
+                message = "Не удалось оформить аренду. Попробуйте позже."
+            });
         }
     }
 

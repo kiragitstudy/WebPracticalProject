@@ -14,14 +14,23 @@ namespace WebPracticalProject.Controllers;
 public sealed class AccountController(IAuthService auth, IUserService users, IContactService contacts) : Controller
 {
     [HttpPost]
-    public async Task<IActionResult> Register([FromBody] RegisterRequest? json, [FromForm] RegisterRequest? form, CancellationToken ct = default)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest? dto, CancellationToken ct = default)
     {
-        var dto = json ?? form;
-        if (dto is null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest(new { ok = false, message = "Заполните email и пароль." });
-        if (!string.Equals(dto.Password, dto.ConfirmPassword))
-            return BadRequest(new { ok = false, message = "Пароли не совпадают." });
+        if (dto is null) return BadRequest(new { ok = false, message = "Пустой запрос." });
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key.Contains('.')
+                        ? kvp.Key.Split('.').Last()
+                        : kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
 
+            return BadRequest(new { ok = false, errors });
+        }
+        
         try
         {
             var vm = await auth.RegisterAsync(new RegisterDto
@@ -31,7 +40,7 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
                 DisplayName = dto.DisplayName
             }, ct);
 
-            await SignInAsync(vm, rememberMe: false); // авто-вход после регистрации
+            await SignInAsync(vm); // авто-вход после регистрации
 
             return Json(new { ok = true, user = new { id = vm.Id, email = vm.Email, displayName = vm.DisplayName, role = vm.Role } });
         }
@@ -42,11 +51,22 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
     }
 
     [HttpPost]
-    public async Task<IActionResult> Login([FromBody] LoginRequest? json, [FromForm] LoginRequest? form, CancellationToken ct = default)
+    public async Task<IActionResult> Login([FromBody] LoginRequest? dto, CancellationToken ct = default)
     {
-        var dto = json ?? form;
-        if (dto is null || string.IsNullOrWhiteSpace(dto.Email) || string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest(new { ok = false, message = "Укажите email и пароль." });
+        if (dto is null) return BadRequest(new { ok = false, message = "Пустой запрос." });
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState
+                .Where(x => x.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key.Contains('.')
+                        ? kvp.Key.Split('.').Last()
+                        : kvp.Key,
+                    kvp => kvp.Value!.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+
+            return BadRequest(new { ok = false, errors });
+        }
 
         try
         {
@@ -56,7 +76,7 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
                 Password = dto.Password!
             }, ct);
 
-            await SignInAsync(vm, rememberMe: dto.RememberMe ?? false);
+            await SignInAsync(vm);
 
             return Json(new { ok = true, user = new { id = vm.Id, email = vm.Email, displayName = vm.DisplayName, role = vm.Role } });
         }
@@ -147,22 +167,22 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
     }
 
     // Helpers: создать куку аутентификации
-    private async Task SignInAsync(AuthUserVm vm, bool rememberMe)
+    private async Task SignInAsync(AuthUserVm vm)
     {
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, vm.Id.ToString("D")),
             new(ClaimTypes.Email, vm.Email),
-            new(ClaimTypes.Name, vm.Email),
-            new(ClaimTypes.Role, vm.Role) // "customer|manager|admin"
+            new(ClaimTypes.Name, vm.DisplayName),
+            new(ClaimTypes.Role, vm.Role) 
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
         var props = new AuthenticationProperties
         {
-            IsPersistent = rememberMe,
-            ExpiresUtc = rememberMe ? DateTimeOffset.UtcNow.AddDays(14) : null
+            IsPersistent = true,
+            ExpiresUtc = DateTimeOffset.UtcNow.AddDays(14)
         };
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, props);
@@ -176,7 +196,9 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
         public required PagedResult<ContactVm> Messages { get; set; }
     }
     
-    public sealed class LoginRequest { public string? Email { get; set; } public string? Password { get; set; } public bool? RememberMe { get; set; } }
+    public sealed class LoginRequest { 
+        public string? Email { get; set; }
+        public string? Password { get; set; } }
     public sealed class RegisterRequest { public string? DisplayName { get; set; } public string? Email { get; set; } public string? Password { get; set; } public string? ConfirmPassword { get; set; } }
     public sealed class UpdateProfileRequest { public string? DisplayName { get; set; } }
     public sealed class DeleteAccountRequest { public string? Password { get; set; } }

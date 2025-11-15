@@ -1,3 +1,5 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebPracticalProject.DAL;
@@ -6,11 +8,23 @@ using WebPracticalProject.DAL.Repositories;
 using WebPracticalProject.Service.Interfaces;
 using WebPracticalProject.Service.Services;
 using WebPracticalProject.Service.Security;
+using WebPracticalProject.Validation;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services
+    .AddFluentValidationAutoValidation(options =>
+    {
+        options.DisableDataAnnotationsValidation = true;
+    })
+    .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<AuthRequestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRentalDtoValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRentalFormValidator>();
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -44,8 +44,8 @@
           <td>@(i.Category ?? "—")</td>
           <td>@i.PricePerDay</td>
           <td>
-            @if (i.IsActive) { <span class="badge text-bg-success">активен</span> } else { <span class="badge text-bg-secondary">скрыт</span> }
-            @if (i.IsFeatured){ <span class="badge text-bg-info ms-1">popular</span> }
+            @if (i.IsActive) { <span class="badge bg-success text-bg-success">активен</span> } else { <span class="badge bg-secondary">скрыт</span> }
+            @if (i.IsFeatured){ <span class="badge bg-info text-bg-info ms-1">popular</span> }
           </td>
           <td class="text-end">
             <form asp-action="UpdateInstrument" asp-controller="Admin" method="post" class="d-inline">

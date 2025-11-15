@@ -36,7 +36,10 @@
     </table>
   </div>
   @{
-    var p = Model.Page; var total = Model.Total; var size = Model.Size; var pages = Math.Max(1, (int)Math.Ceiling((double)total/size));
+    var p = Model.Page; 
+    var total = Model.Total; 
+    var size = Model.Size; 
+    var pages = Math.Max(1, (int)Math.Ceiling((double)total/size));
   }
   <nav>
     <ul class="pagination">
