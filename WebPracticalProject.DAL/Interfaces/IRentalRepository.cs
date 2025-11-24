@@ -12,5 +12,8 @@ public interface IRentalRepository
     Task<(IReadOnlyList<Rental> Items,int Total)> GetPagedAsync(int page, int size, CancellationToken ct);
     Task<(IReadOnlyList<Rental> Items,int Total)> GetPagedByUserAsync(Guid userId, int page, int size, CancellationToken ct);
     Task<bool> ExistsOverlapAsync(Guid instrumentId, DateTimeOffset start, DateTimeOffset end, CancellationToken ct);
-
+    Task<Dictionary<Guid, DateTimeOffset>> GetBusyUntilNowAsync(
+        IEnumerable<Guid> instrumentIds,
+        DateTimeOffset now,
+        CancellationToken ct);
 }

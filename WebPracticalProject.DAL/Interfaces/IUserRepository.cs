@@ -12,4 +12,6 @@ public interface IUserRepository
     Task<bool> EmailExistsAsync(string email, CancellationToken ct);
     Task SetLastLoginAsync(Guid id, DateTimeOffset at, CancellationToken ct);
     Task<(IReadOnlyList<User> Items,int Total)> GetPagedAsync(int page, int size, CancellationToken ct);
+    Task<User?> GetByGoogleIdAsync(string googleId, CancellationToken ct);
+    Task SetGoogleIdAsync(Guid userId, string googleId, CancellationToken ct);
 }

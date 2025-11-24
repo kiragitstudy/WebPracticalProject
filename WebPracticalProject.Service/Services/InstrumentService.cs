@@ -13,30 +13,105 @@ public sealed class InstrumentService(IInstrumentRepository repo) : IInstrumentS
     public async Task<InstrumentVm> CreateAsync(CreateInstrumentDto dto, CancellationToken ct)
     {
         var id = await repo.CreateAsync(new CreateInstrumentArgs(
-            dto.Title.Trim(), dto.Brand, dto.Category, dto.Description, dto.ImageUrl, dto.PricePerDay, dto.IsFeatured, dto.IsActive
+            dto.Title.Trim(),
+            dto.Brand,
+            dto.Category,
+            dto.Description,
+            dto.ImageUrl,
+            dto.PricePerDay,
+            dto.IsFeatured,
+            dto.IsActive
         ), ct);
-        var m = await repo.GetByIdAsync(id, ct);
-        return new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl };
+
+        var m = await repo.GetByIdAsync(id, ct)
+                ?? throw new InvalidOperationException("Instrument not found after creation.");
+
+        return ToVm(m);
     }
 
     public Task UpdateAsync(Guid id, UpdateInstrumentDto dto, CancellationToken ct) =>
-        repo.UpdateAsync(id, new UpdateInstrumentArgs(dto.Title, dto.Brand, dto.Category, dto.Description, dto.ImageUrl, dto.PricePerDay, dto.IsFeatured, dto.IsActive), ct);
-
+        repo.UpdateAsync(id, new UpdateInstrumentArgs(
+            dto.Title,
+            dto.Brand,
+            dto.Category,
+            dto.Description,
+            dto.ImageUrl,
+            dto.PricePerDay,
+            dto.IsFeatured,
+            dto.IsActive
+        ), ct);
     public async Task<InstrumentVm?> GetAsync(Guid id, CancellationToken ct)
     {
         var m = await repo.GetByIdAsync(id, ct);
-        return m is null ? null : new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl };
+        return m is null ? null : ToVm(m);
     }
 
-    public async Task<PagedResult<InstrumentVm>> ListAsync(string? category, int page, int size, CancellationToken ct)
+    public async Task<PagedResult<InstrumentVm>> ListAsync(
+        string? category,
+        string? brand,
+        decimal? minPrice,
+        decimal? maxPrice,
+        bool onlyActive,
+        bool featured,
+        string? sort,
+        int page,
+        int size,
+        CancellationToken ct)
     {
-        var (items,total) = await repo.GetPagedAsync(category, page, size, ct);
+        var sortEnum = sort switch
+        {
+            "price_asc"  => InstrumentSort.PriceAsc,
+            "price_desc" => InstrumentSort.PriceDesc,
+            "title_asc"  => InstrumentSort.TitleAsc,
+            "title_desc" => InstrumentSort.TitleDesc,
+            _            => InstrumentSort.Default
+        };
+
+        var (items, total) = await repo.GetPagedAsync(
+            category,
+            brand,
+            minPrice,
+            maxPrice,
+            onlyActive,
+            featured,
+            sortEnum,
+            page,
+            size,
+            ct);
+
         return new PagedResult<InstrumentVm>
         {
-            Page = page, Size = size, Total = total,
-            Items = items.Select(m => new InstrumentVm { Id=m.Id, Title=m.Title, Description = m.Description, Brand=m.Brand, Category=m.Category, PricePerDay=m.PricePerDay, IsActive = m.IsActive, IsFeatured = m.IsFeatured, ImageUrl=m.ImageUrl }).ToList()
+            Page = page,
+            Size = size,
+            Total = total,
+            Items = items.Select(ToVm).ToList()
         };
     }
 
+
     public Task DeleteAsync(Guid id, CancellationToken ct) => repo.DeleteAsync(id, ct);
+    
+    public async Task<IReadOnlyList<string>> GetCategoriesAsync(CancellationToken ct)
+    {
+        var list = await repo.GetCategoriesAsync(ct);
+        // Можно дополнительно сортировать/чистить
+        return list
+            .Where(c => !string.IsNullOrWhiteSpace(c))
+            .Distinct()
+            .OrderBy(c => c)
+            .ToArray();
+    }
+
+    private static InstrumentVm ToVm(Instrument m) => new()
+    {
+        Id = m.Id,
+        Title = m.Title,
+        Description = m.Description,
+        Brand = m.Brand,
+        Category = m.Category,
+        PricePerDay = m.PricePerDay,
+        IsActive = m.IsActive,
+        IsFeatured = m.IsFeatured,
+        ImageUrl = m.ImageUrl
+    };
 }

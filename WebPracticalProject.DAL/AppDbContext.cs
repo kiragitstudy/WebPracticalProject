@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebPracticalProject.Domain.Catalog;
 using WebPracticalProject.Domain.Common;
 using WebPracticalProject.Domain.Contacts;
+using WebPracticalProject.Domain.Emails;
 using WebPracticalProject.Domain.Rentals;
 using WebPracticalProject.Domain.Users;
 
@@ -14,6 +15,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
     public DbSet<Instrument> Instruments => Set<Instrument>();
     public DbSet<Rental> Rentals => Set<Rental>();
+    public DbSet<EmailConfirmationToken> EmailConfirmationTokens => Set<EmailConfirmationToken>();
 
     protected override void OnModelCreating(ModelBuilder model)
     {
@@ -97,6 +99,28 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasIndex(x => x.UserId);
             e.HasIndex(x => x.InstrumentId);
             e.HasIndex(x => x.Status);
+        });
+        
+        model.Entity<EmailConfirmationToken>(e =>
+        {
+            e.ToTable("email_confirmation_tokens");
+            e.Property(x => x.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .ValueGeneratedOnAdd();
+            e.Property(x => x.Token)
+                .IsRequired()
+                .HasColumnType("text");
+            e.Property(x => x.ExpiresAt)
+                .HasColumnType("timestamptz");
+            e.Property(x => x.Used)
+                .HasDefaultValue(false);
+
+            e.HasIndex(x => x.Token).IsUnique();
+
+            e.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

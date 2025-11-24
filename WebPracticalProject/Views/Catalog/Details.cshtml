@@ -5,26 +5,68 @@
 }
 
 <div class="container py-5">
+
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Catalog" asp-action="Index">Каталог</a>
+            </li>
+            @if (!string.IsNullOrWhiteSpace(Model.Category))
+            {
+                <li class="breadcrumb-item">
+                    <a asp-controller="Catalog"
+                       asp-action="Index"
+                       asp-route-category="@Model.Category">
+                        @Model.Category
+                    </a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </nav>
+
     <div class="row g-4">
         <div class="col-lg-6">
             <div class="ratio ratio-4x3 rounded-4 overflow-hidden shadow-sm">
-                <img src="@(Model.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")" class="w-100 h-100 object-fit-cover" alt="@Model.Title" />
+                <img src="@(Model.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")"
+                     class="w-100 h-100 object-fit-cover"
+                     alt="@Model.Title" />
             </div>
         </div>
+
         <div class="col-lg-6">
             <h1 class="h3 mb-2">@Model.Title</h1>
-            <div class="mb-2 text-body-secondary">@(Model.Brand ?? "—") · @(Model.Category ?? "—")</div>
-            <div class="mb-3">Цена/сутки: <span class="fw-semibold">@Model.PricePerDay.ToString("0.##")</span></div>
-            <p class="mb-4">@(Model.Description ?? "Описание будет позже.")</p>
+
+            <ul class="list-unstyled mb-3 small text-body-secondary">
+                <li><strong>Бренд:</strong> @(Model.Brand ?? "—")</li>
+                <li><strong>Категория:</strong> @(Model.Category ?? "—")</li>
+                <li><strong>Цена за сутки:</strong> @Model.PricePerDay.ToString("0.##")$</li>
+                <li><strong>Статус:</strong> @(Model.IsActive ? "Доступен для аренды" : "Временно недоступен")</li>
+            </ul>
+
+            <p class="mb-4">
+                @(Model.Description ?? "Описание будет добавлено позже.")
+            </p>
 
             <div class="d-flex gap-2">
-                <a class="btn btn-primary" asp-controller="Rentals" asp-action="Create" asp-route-instrumentId="@Model.Id">Взять в прокат</a>
-                <a class="btn btn-outline-secondary" asp-controller="Catalog" asp-action="Index">Назад к каталогу</a>
+                <a class="btn btn-primary @(Model.IsActive ? "" : "disabled")"
+                   asp-controller="Rentals"
+                   asp-action="Create"
+                   asp-route-instrumentId="@Model.Id">
+                    Взять в прокат
+                </a>
+                <a class="btn btn-outline-secondary"
+                   asp-controller="Catalog"
+                   asp-action="Index">
+                    Назад к каталогу
+                </a>
             </div>
 
             @if (!Model.IsActive)
             {
-                <div class="alert alert-warning mt-3">Инструмент временно недоступен.</div>
+                <div class="alert alert-warning mt-3 mb-0">
+                    Инструмент временно недоступен. Уточните сроки в отделе проката.
+                </div>
             }
         </div>
     </div>

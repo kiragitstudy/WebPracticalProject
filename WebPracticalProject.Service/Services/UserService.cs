@@ -6,13 +6,6 @@ using WebPracticalProject.Service.Interfaces;
 namespace WebPracticalProject.Service.Services;
 public sealed class UserService(IUserRepository repo) : IUserService
 {
-    public async Task<UserVm> CreateAsync(CreateUserDto dto, CancellationToken ct)
-    {
-        var id = await repo.CreateAsync(new CreateUserArgs(dto.Email.Trim(), dto.Password /*hash тут*/, dto.DisplayName, dto.Role), ct);
-        var got = await repo.GetByIdAsync(id, ct);
-        return new UserVm { Id=got.Id, Email=got.Email, DisplayName=got.DisplayName, Role=got.Role };
-    }
-    
     public async Task<UserVm?> GetAsync(Guid id, CancellationToken ct)
     {
         var u = await repo.GetByIdAsync(id, ct);

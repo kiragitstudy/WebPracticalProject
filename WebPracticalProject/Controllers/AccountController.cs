@@ -91,7 +91,22 @@ public sealed class AccountController(IAuthService auth, IUserService users, ICo
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        return Json(new { ok = true });
+        return RedirectToAction("Index", "Home");
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ConfirmEmail(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
+            // некорректная ссылка → флаг invalid
+            return Redirect("/?email_confirmed=invalid");
+        }
+
+        var ok = await auth.ConfirmEmailAsync(token);
+
+        // ok → успешное подтверждение, fail → токен протух или не совпал с email
+        return Redirect(ok ? "/?email_confirmed=ok" : "/?email_confirmed=fail");
     }
 
     [HttpGet]

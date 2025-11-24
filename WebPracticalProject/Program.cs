@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using WebPracticalProject.DAL;
 using WebPracticalProject.DAL.Interfaces;
 using WebPracticalProject.DAL.Repositories;
+using WebPracticalProject.Service.Dto;
 using WebPracticalProject.Service.Interfaces;
 using WebPracticalProject.Service.Services;
 using WebPracticalProject.Service.Security;
@@ -26,13 +27,19 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 builder.Services.AddValidatorsFromAssemblyContaining<CreateRentalDtoValidator>(); 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateRentalFormValidator>();
 
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 builder.Services
-    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(opt =>
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    })
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opt =>
     {
         opt.Cookie.Name = "wpp_auth";
         opt.Cookie.HttpOnly = true;
@@ -45,7 +52,7 @@ builder.Services
         {
             OnRedirectToLogin = ctx =>
             {
-                if (ctx.Request.Path.StartsWithSegments("/api") 
+                if (ctx.Request.Path.StartsWithSegments("/api")
                     || ctx.Request.Headers["Accept"].ToString().Contains("application/json"))
                 {
                     ctx.Response.StatusCode = StatusCodes.Status401Unauthorized;
@@ -56,7 +63,7 @@ builder.Services
             },
             OnRedirectToAccessDenied = ctx =>
             {
-                if (ctx.Request.Path.StartsWithSegments("/api") 
+                if (ctx.Request.Path.StartsWithSegments("/api")
                     || ctx.Request.Headers["Accept"].ToString().Contains("application/json"))
                 {
                     ctx.Response.StatusCode = StatusCodes.Status403Forbidden;
@@ -66,6 +73,15 @@ builder.Services
                 return Task.CompletedTask;
             }
         };
+    })
+    .AddCookie("External")
+    .AddGoogle("Google", options =>
+    {
+        var googleSection = builder.Configuration.GetSection("Authentication:Google");
+        options.ClientId = googleSection["ClientId"]!;
+        options.ClientSecret = googleSection["ClientSecret"]!;
+        options.CallbackPath = "/signin-google";
+        options.SignInScheme = "External";
     });
 
 builder.Services.AddAuthorization();
@@ -76,7 +92,9 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IInstrumentRepository, InstrumentRepository>();
 builder.Services.AddScoped<IRentalRepository, RentalRepository>();
 builder.Services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
+builder.Services.AddScoped<IEmailConfirmationRepository, EmailConfirmationRepository>();
 
+builder.Services.AddScoped<IEmailSender, EmailService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IInstrumentService, InstrumentService>();
 builder.Services.AddScoped<IRentalService, RentalService>();

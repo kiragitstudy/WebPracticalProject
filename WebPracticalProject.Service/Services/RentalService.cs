@@ -12,20 +12,47 @@ public sealed class RentalService(IRentalRepository rentals, IInstrumentReposito
 {
     public async Task<RentalVm> CreateAsync(CreateRentalDto dto, CancellationToken ct)
     {
-        if (dto.EndAt <= dto.StartAt) throw new ArgumentException("end <= start");
-        var instr = await instruments.GetByIdAsync(dto.InstrumentId, ct) ?? throw new KeyNotFoundException("instrument");
+        if (dto.EndAt <= dto.StartAt)
+            throw new ArgumentException("end <= start");
+
+        // 1) Проверка пересечения по датам
+        var overlap = await rentals.ExistsOverlapAsync(dto.InstrumentId, dto.StartAt, dto.EndAt, ct);
+        if (overlap)
+            throw new InvalidOperationException("Инструмент уже забронирован на выбранные даты.");
+
+        // 2) Считаем стоимость
+        var instr = await instruments.GetByIdAsync(dto.InstrumentId, ct)
+                    ?? throw new KeyNotFoundException("instrument");
+
         var days = (int)Math.Ceiling((dto.EndAt - dto.StartAt).TotalDays);
         if (days <= 0) days = 1;
 
         var id = await rentals.CreateAsync(
-            new CreateRentalArgs(dto.UserId, dto.InstrumentId, dto.StartAt, dto.EndAt, instr.PricePerDay * days), ct);
+            new CreateRentalArgs(dto.UserId, dto.InstrumentId, dto.StartAt, dto.EndAt, instr.PricePerDay * days),
+            ct);
 
-        var r = await rentals.GetByIdAsync(id, ct)!;
-        return new RentalVm { Id=r.Id, UserId=r.UserId,
-            InstrumentId=r.InstrumentId, StartAt=r.StartAt, 
-            EndAt=r.EndAt, Status=r.Status.ToString().ToLower(), 
-            TotalAmount=r.TotalAmount,
-            CreatedAt = r.CreatedAt };
+        var r = await rentals.GetByIdAsync(id, ct)
+                ?? throw new InvalidOperationException("rental not found after creation");
+
+        return new RentalVm
+        {
+            Id          = r.Id,
+            UserId      = r.UserId,
+            InstrumentId= r.InstrumentId,
+            StartAt     = r.StartAt,
+            EndAt       = r.EndAt,
+            Status      = r.Status.ToString().ToLower(),
+            TotalAmount = r.TotalAmount,
+            CreatedAt   = r.CreatedAt
+        };
+    }
+    
+    public async Task<Dictionary<Guid, DateTimeOffset>> GetBusyUntilNowAsync(
+        IEnumerable<Guid> instrumentIds,
+        CancellationToken ct)
+    {
+        var now = DateTimeOffset.UtcNow;
+        return await rentals.GetBusyUntilNowAsync(instrumentIds, now, ct);
     }
 
     public async Task<PagedResult<RentalVm>> ListMineAsync(Guid userId, int page, int size, CancellationToken ct)

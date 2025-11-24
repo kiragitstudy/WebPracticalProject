@@ -27,7 +27,7 @@
               <div class="small text-body-secondary mb-1">
                 @(Model.Instrument.Brand ?? "—") · @(Model.Instrument.Category ?? "—")
               </div>
-              <div class="mb-2">Цена/сутки: <span class="fw-semibold">@Model.Instrument.PricePerDay.ToString("0.##")</span></div>
+              <div class="mb-2">Цена/сутки: <span class="fw-semibold">@Model.Instrument.PricePerDay.ToString("0.##")$</span></div>
               <div>
                 @if (Model.Instrument.IsActive) { <span class="badge text-bg-success">доступен</span> } else { <span class="badge text-bg-secondary">скрыт</span> }
                 @if (Model.Instrument.IsFeatured) { <span class="badge text-bg-info ms-1">popular</span> }
@@ -79,7 +79,7 @@
                     <div>
                       <div class="small text-body-secondary">Предварительный расчёт</div>
                       <div class="fw-semibold">
-                        <span id="estDays">—</span> сут. × @Model.Instrument.PricePerDay.ToString("0.##") = <span id="estTotal">—</span>
+                        <span id="estDays">—</span> сут. × @Model.Instrument.PricePerDay.ToString("0.##")$ = <span id="estTotal">—</span>
                       </div>
                     </div>
                     <div class="small text-body-secondary">Фактическая сумма фиксируется при создании</div>

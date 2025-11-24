@@ -1,66 +1,273 @@
 @using WebPracticalProject.Service.Dto
 @model PagedResult<InstrumentVm>
+
 @{
     ViewData["Title"] = "Каталог";
+
     var category = ViewBag.Category as string;
+    var brand = ViewBag.Brand as string;
+    var minPrice = ViewBag.MinPrice as decimal?;
+    var maxPrice = ViewBag.MaxPrice as decimal?;
+    var sort = ViewBag.Sort as string;
+    var onlyActive = ViewBag.OnlyActive as bool? ?? true;
+    var featured = ViewBag.Featured as bool? ?? false;
+    var categories = ViewBag.Categories as IEnumerable<string> ?? Array.Empty<string>();
+
     int p = Model.Page, size = Model.Size, total = Model.Total;
-    int pages = Math.Max(1, (int)Math.Ceiling((double)total/size));
+    int pages = Math.Max(1, (int)Math.Ceiling((double)total / size));
+    var busyUntil = ViewBag.BusyUntil as Dictionary<Guid, DateTimeOffset>
+                    ?? new Dictionary<Guid, DateTimeOffset>();
 }
 
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Каталог</h1>
 
-        <form method="get" class="d-flex gap-2" asp-controller="Catalog" asp-action="Index">
-            <input type="text" name="category" class="form-control" placeholder="Категория (guitar, drums…)" value="@(category ?? "")" />
-            <button class="btn btn-outline-primary" type="submit">Фильтр</button>
-        </form>
+    <!-- Заголовок + краткая статистика + компактная сортировка -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1">Каталог инструментов</h1>
+            <div class="text-body-secondary small">
+                Найдено @total позиций
+                @if (!string.IsNullOrWhiteSpace(category))
+                {
+                    @: в категории «@category»
+                }
+                .
+            </div>
+        </div>
+        <div class="d-none d-md-flex align-items-center gap-2">
+            <span class="small text-body-secondary">Сортировка:</span>
+            <form method="get" asp-controller="Catalog" asp-action="Index" class="d-flex gap-2">
+                <input type="hidden" name="category" value="@category" />
+                <input type="hidden" name="brand" value="@brand" />
+                <input type="hidden" name="minPrice" value="@(minPrice?.ToString("0.##"))" />
+                <input type="hidden" name="maxPrice" value="@(maxPrice?.ToString("0.##"))" />
+                <input type="hidden" name="onlyActive" value="@(onlyActive.ToString().ToLower())" />
+                <input type="hidden" name="featured" value="@(featured.ToString().ToLower())" />
+                <input type="hidden" name="page" value="@p" />
+
+                <select name="sort" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="" selected="@(string.IsNullOrEmpty(sort) ? "selected" : null)">
+                        По умолчанию
+                    </option>
+                    <option value="price_asc" selected="@(sort == "price_asc" ? "selected" : null)">
+                        Сначала дешевле
+                    </option>
+                    <option value="price_desc" selected="@(sort == "price_desc" ? "selected" : null)">
+                        Сначала дороже
+                    </option>
+                    <option value="title_asc" selected="@(sort == "title_asc" ? "selected" : null)">
+                        По названию A–Z
+                    </option>
+                    <option value="title_desc" selected="@(sort == "title_desc" ? "selected" : null)">
+                        По названию Z–A
+                    </option>
+                </select>
+
+                <select name="size" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="9"  selected="@(size == 9  ? "selected" : null)">9 на странице</option>
+                    <option value="12" selected="@(size == 12 ? "selected" : null)">12 на странице</option>
+                    <option value="24" selected="@(size == 24 ? "selected" : null)">24 на странице</option>
+                </select>
+            </form>
+        </div>
     </div>
 
+    <!-- Основная форма фильтров -->
+    <div class="border rounded-3 p-3 mb-4 bg-light-subtle">
+        <form method="get" asp-controller="Catalog" asp-action="Index" class="row g-3">
+            <input type="hidden" name="sort" value="@sort" />
+            <input type="hidden" name="size" value="@size" />
+            <input type="hidden" name="page" value="@p" />
+            <div class="col-12 col-md-3">
+                <label class="form-label small mb-1">Категория</label>
+                <select name="category" class="form-select">
+                    <option value="">Все категории</option>
+                    @foreach (var c in categories)
+                    {
+                        <option value="@c" selected="@(c == category ? "selected" : null)">@c</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label small mb-1">Бренд</label>
+                <input type="text"
+                       name="brand"
+                       class="form-control"
+                       placeholder="Например, Fender"
+                       value="@brand"/>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">Цена от, $/сутки</label>
+                <input type="number"
+                       step="0.01"
+                       min="0"
+                       name="minPrice"
+                       class="form-control"
+                       value="@(minPrice?.ToString("0.##"))"/>
+            </div>
+
+            <div class="col-6 col-md-2">
+                <label class="form-label small mb-1">до</label>
+                <input type="number"
+                       step="0.01"
+                       min="0"
+                       name="maxPrice"
+                       class="form-control"
+                       value="@(maxPrice?.ToString("0.##"))"/>
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label class="form-label small mb-1 d-block">Дополнительно</label>
+                <div class="form-check small">
+                    <!-- Если чекбокс не отмечен, в запрос уйдёт только это поле -->
+                    <input type="hidden" name="onlyActive" value="false"/>
+
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="onlyActive"
+                           name="onlyActive"
+                           value="true"
+                           @(onlyActive ? "checked" : null)/>
+
+                    <label class="form-check-label" for="onlyActive">
+                        Только доступные
+                    </label>
+                </div>
+                <div class="form-check small">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="true"
+                           id="featured"
+                           name="featured"
+                           @(featured ? "checked" : null)/>
+                    <label class="form-check-label" for="featured">
+                        Хиты / избранные
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-12 d-flex gap-2 justify-content-end">
+                <button class="btn btn-primary" type="submit">Применить фильтры</button>
+                <a class="btn btn-outline-secondary" href="@Url.Action("Index", "Catalog")">Сбросить</a>
+            </div>
+        </form>
+    </div>
     @if (!Model.Items.Any())
     {
-    <div class="alert alert-info">Позиции не найдены.</div>
+        <div class="alert alert-info">Позиции не найдены.</div>
     }
     else
     {
-    <div class="row g-4">
-        @foreach (var i in Model.Items)
-        {
-        <div class="col-sm-6 col-lg-4">
-            <div class="card h-100 border-0 shadow-sm">
-                <div class="ratio ratio-4x3">
-                    <img src="@(i.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")" class="card-img-top object-fit-cover" alt="@i.Title" />
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <h3 class="h5 card-title">@i.Title</h3>
-                    <div class="small text-body-secondary mb-2">
-                        @(i.Brand ?? "—") · @(i.Category ?? "—")
+        <div class="row g-4">
+            @foreach (var i in Model.Items)
+            {
+                var isBusy = busyUntil.ContainsKey(i.Id);
+                DateTimeOffset? busyTo = isBusy ? busyUntil[i.Id] : null;
+            
+                <div class="col-sm-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="ratio ratio-4x3">
+                            <img src="@(i.ImageUrl ?? "https://via.placeholder.com/800x600?text=No+Image")"
+                                 class="card-img-top object-fit-cover"
+                                 alt="@i.Title" />
+                        </div>
+                        <div class="card-body d-flex flex-column">
+            
+                            <div class="mb-1">
+                                @if (i.IsFeatured)
+                                {
+                                    <span class="badge bg-warning text-dark me-1">Популярное</span>
+                                }
+                                @if (!i.IsActive)
+                                {
+                                    <span class="badge bg-secondary me-1">Скрыто</span>
+                                }
+                                @if (isBusy)
+                                {
+                                    <span class="badge bg-danger">В аренде</span>
+                                }
+                            </div>
+            
+                            <h3 class="h5 card-title">@i.Title</h3>
+            
+                            <div class="small text-body-secondary mb-2">
+                                @(i.Brand ?? "—") · @(i.Category ?? "—")
+                            </div>
+            
+                            <p class="text-body-secondary small flex-grow-1 mb-3">
+                                Посуточно от @i.PricePerDay.ToString("0.##") $
+                                @if (isBusy && busyTo.HasValue)
+                                {
+                                    <br />
+                                    <span>Занят до @busyTo.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                }
+                            </p>
+            
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-primary"
+                                   asp-controller="Catalog"
+                                   asp-action="Details"
+                                   asp-route-id="@i.Id">
+                                    Подробнее
+                                </a>
+                                
+                                
+                                @if (i.IsActive)
+                                {
+                                    <a class="btn btn-outline-primary @(isBusy ? "disabled" : "")"
+                                       asp-controller="Rentals"
+                                       asp-action="Create"
+                                       asp-route-instrumentId="@i.Id">
+                                        @(isBusy ? "Недоступен" : "В прокат")
+                                    </a>
+                                }
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-body-secondary small flex-grow-1 mb-3">
-                        Посуточно от @i.PricePerDay.ToString("0.##")
-                    </p>
-                    <div class="d-flex gap-2">
-                        <a class="btn btn-primary" asp-controller="Catalog" asp-action="Details" asp-route-id="@i.Id">Подробнее</a>
-                        <a class="btn btn-outline-primary" asp-controller="Rentals" asp-action="Create" asp-route-instrumentId="@i.Id">В прокат</a>
-                    </div>
                 </div>
-            </div>
+            }
         </div>
-        }
-    </div>
 
-    <nav class="mt-4">
-        <ul class="pagination">
-            <li class="page-item @(p<=1?"disabled":null)">
-                <a class="page-link" href="@Url.Action("Index", new { category, page = p-1, size })">Назад</a>
-            </li>
-            <li class="page-item disabled">
-                <span class="page-link">@p / @pages</span>
-            </li>
-            <li class="page-item @(p>=pages?"disabled":null)">
-                <a class="page-link" href="@Url.Action("Index", new { category, page = p+1, size })">Вперёд</a>
-            </li>
-        </ul>
-    </nav>
+        <nav class="mt-4">
+            <ul class="pagination">
+                <li class="page-item @(p <= 1 ? "disabled" : null)">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                                 category,
+                                 brand,
+                                 minPrice,
+                                 maxPrice,
+                                 sort,
+                                 onlyActive,
+                                 featured,
+                                 page = p - 1,
+                                 size
+                             })">
+                        Назад
+                    </a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">@p / @pages</span>
+                </li>
+                <li class="page-item @(p >= pages ? "disabled" : null)">
+                    <a class="page-link"
+                       href="@Url.Action("Index", new {
+                                 category,
+                                 brand,
+                                 minPrice,
+                                 maxPrice,
+                                 sort,
+                                 onlyActive,
+                                 featured,
+                                 page = p + 1,
+                                 size
+                             })">
+                        Вперёд
+                    </a>
+                </li>
+            </ul>
+        </nav>
     }
 </div>

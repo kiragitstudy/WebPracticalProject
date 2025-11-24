@@ -27,6 +27,8 @@ CREATE TABLE IF NOT EXISTS app.contact_messages (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+CREATE INDEX IF NOT EXISTS ix_contact_messages_email_ci ON app.contact_messages (lower(email));
+
 -- ============= INSTRUMENTS (каталог) =============
 CREATE TABLE IF NOT EXISTS app.instruments (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -63,5 +65,14 @@ CREATE INDEX IF NOT EXISTS ix_rentals_user ON app.rentals(user_id);
 CREATE INDEX IF NOT EXISTS ix_rentals_instr ON app.rentals(instrument_id);
 CREATE INDEX IF NOT EXISTS ix_rentals_status ON app.rentals(status);
 
-CREATE INDEX IF NOT EXISTS ix_contact_messages_email_ci
-    ON app.contact_messages (lower(email));
+-- ============= EMAIL CONFIRMATION TOKENS =============
+CREATE TABLE IF NOT EXISTS app.email_confirmation_tokens (                                                
+    id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id    UUID        NOT NULL REFERENCES app.users(id) ON DELETE CASCADE,
+    token      TEXT        NOT NULL,
+    expires_at TIMESTAMPTZ NOT NULL,
+    used       BOOLEAN     NOT NULL DEFAULT FALSE
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS ix_email_tokens_token ON app.email_confirmation_tokens(token);
+CREATE INDEX IF NOT EXISTS ix_email_tokens_user ON app.email_confirmation_tokens(user_id);

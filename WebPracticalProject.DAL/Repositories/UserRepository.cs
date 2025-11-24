@@ -8,9 +8,15 @@ public sealed class UserRepository(AppDbContext db) : IUserRepository
 {
     public async Task<Guid> CreateAsync(CreateUserArgs a, CancellationToken ct)
     {
-        var e = new User { Email=a.Email, PasswordHash=a.PasswordHash, DisplayName=a.DisplayName, Role=a.Role, EmailConfirmed=false };
+        var e = new User { 
+            Email=a.Email, 
+            PasswordHash=a.PasswordHash, 
+            DisplayName=a.DisplayName, 
+            Role=a.Role, 
+            EmailConfirmed=a.IsEmailConfirmed 
+        };
         await db.Users.AddAsync(e, ct);
-        await db.SaveChangesAsync(ct);   // БД сгенерит id/created_at
+        await db.SaveChangesAsync(ct);
         return e.Id;
     }
 
@@ -43,6 +49,18 @@ public sealed class UserRepository(AppDbContext db) : IUserRepository
     public Task SetLastLoginAsync(Guid id, DateTimeOffset at, CancellationToken ct) =>
         db.Users.Where(x => x.Id == id)
             .ExecuteUpdateAsync(s => s.SetProperty(x => x.LastLoginAt, at), ct);
+    
+    
+    public Task<User?> GetByGoogleIdAsync(string googleId, CancellationToken ct)
+        => db.Users.FirstOrDefaultAsync(u => u.GoogleId == googleId, ct);
+
+    public async Task SetGoogleIdAsync(Guid userId, string googleId, CancellationToken ct)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId, ct);
+        if (user == null) return;
+        user.GoogleId = googleId;
+        await db.SaveChangesAsync(ct);
+    }
     
     public async Task<(IReadOnlyList<User>, int)> GetPagedAsync(int page,int size,CancellationToken ct)
     {

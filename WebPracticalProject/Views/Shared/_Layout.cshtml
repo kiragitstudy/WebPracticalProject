@@ -58,6 +58,11 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Профиль</a></li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Rentals" asp-action="My">
+                                        <i class="bi bi-calendar-check me-1"></i> Мои аренды
+                                    </a>
+                                </li>
                                 @if (role == "admin")
                                 {
                                     <li><a class="dropdown-item" asp-controller="Admin" asp-action="Users">Пользователи</a></li>
@@ -132,6 +137,10 @@
                     <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Отмена</button>
                     <button class="btn btn-primary" type="submit">Войти</button>
                 </div>
+                <a class="btn btn-outline-danger w-100"
+                   href="/ExternalAuth/GoogleLogin?returnUrl=/">
+                    Войти через Google
+                </a>
             </form>
         </div>
     </div>
@@ -173,6 +182,10 @@
                     <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Отмена</button>
                     <button class="btn btn-primary" type="submit">Создать аккаунт</button>
                 </div>
+                <a class="btn btn-outline-danger w-100"
+                   href="/ExternalAuth/GoogleLogin?returnUrl=/">
+                    Войти через Google
+                </a>
             </form>
         </div>
     </div>

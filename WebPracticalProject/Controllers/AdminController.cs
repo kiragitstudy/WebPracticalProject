@@ -53,10 +53,24 @@ public sealed class AdminController(IUserService users, IContactService contacts
     
     [Authorize(Roles = "admin,manager")]
     [HttpGet]
-    public async Task<IActionResult> Instruments(int page = 1, int size = 20, CancellationToken ct = default)
+    public async Task<IActionResult> Instruments(
+        int page = 1,
+        int size = 20,
+        CancellationToken ct = default)
     {
-        var vm = await instruments.ListAsync(category: null, page, size, ct);
-        return View(vm); // Views/Admin/Instruments.cshtml
+        var vm = await instruments.ListAsync(
+            category: null,
+            brand: null,
+            minPrice: null,
+            maxPrice: null,
+            onlyActive: false,   // админ видит ВСЕ интсрументы
+            featured: false,
+            sort: "title_asc",
+            page: page,
+            size: size,
+            ct: ct);
+
+        return View(vm);
     }
     
     [Authorize(Roles = "admin,manager")]

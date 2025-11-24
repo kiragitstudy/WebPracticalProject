@@ -59,4 +59,33 @@ public sealed class RentalRepository(AppDbContext db) : IRentalRepository
         var items = await q.Skip((page-1)*size).Take(size).ToListAsync(ct);
         return (items,total);
     }
+    
+    public async Task<Dictionary<Guid, DateTimeOffset>> GetBusyUntilNowAsync(
+        IEnumerable<Guid> instrumentIds,
+        DateTimeOffset now,
+        CancellationToken ct)
+    {
+        var ids = instrumentIds.Distinct().ToArray();
+        if (ids.Length == 0)
+            return new Dictionary<Guid, DateTimeOffset>();
+
+        var query = db.Rentals.AsNoTracking()
+            .Where(r =>
+                ids.Contains(r.InstrumentId) &&
+                (r.Status == RentalStatus.Active || r.Status == RentalStatus.Draft) &&
+                r.StartAt <= now &&
+                r.EndAt > now);
+
+        var list = await query
+            .GroupBy(r => r.InstrumentId)
+            .Select(g => new
+            {
+                InstrumentId = g.Key,
+                Until = g.Min(x => x.EndAt) // ближайшее окончание аренды
+            })
+            .ToListAsync(ct);
+
+        return list.ToDictionary(x => x.InstrumentId, x => x.Until);
+    }
+
 }

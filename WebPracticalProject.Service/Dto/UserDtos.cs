@@ -19,8 +19,9 @@ public sealed class AuthUserVm
 {
     public required Guid Id { get; init; }
     public required string Email { get; init; }
-    public string? DisplayName { get; init; }
-    public required string Role { get; init; } // в нижнем регистре
+    public required string? DisplayName { get; init; }
+    public required string Role { get; init; }
+    public required bool IsEmailConfirmed { get; init; }
 }
 
 public sealed class CreateUserDto
